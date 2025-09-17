@@ -1,0 +1,21 @@
+.col-2 {
+    background-color: rgb(4, 1, 23);
+    min-height: 100vh;
+}
+
+.col-10 {
+    background-color: black;
+    min-height: 100vh;
+}
+
+.nav-link {
+    background-color: #121fd6;
+    color: white;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+h1 {
+    color: white;
+}
