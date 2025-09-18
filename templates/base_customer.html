@@ -10,16 +10,16 @@
 <body>
   <div class="container-fluid">
     <div class="row align-items-start">
-      <div class="col-2 ps-0 bg-dark">
+      <div class="col-2 ps-0 bg-dark min-vh-100">
           <nav class="nav flex-column bg-dark">
-          <a class="nav-link active" aria-current="page" href="#">Active</a>
-          <a class="nav-link" href="#">Link</a>
-          <a class="nav-link" href="#">Link</a>
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+          <a class="nav-link active btn btn-primary" aria-current="page" href="#">Dashboard</a>
+          <a class="nav-link btn btn-primary" href="#">Deposit</a>
+          <a class="nav-link btn btn-primary" href="#">Withdraw</a>
+          <a class="nav-link btn btn-primary" href="#">Transaction History</a>
+          <a class="nav-link btn btn-primary" href="#">Settings</a>
         </nav>
-
       </div>
-      <div class="col-10 bg-dark">
+      <div class="col-10 bg-dark min-vh-100">
         {% block content %}{% endblock %}
       </div>
     </div>
