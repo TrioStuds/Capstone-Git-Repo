@@ -11,46 +11,47 @@
     <h1 class="text-center text-white">Stock App</h1>
   </div>
     <!--Register box thingy-->
-<div class="register-container d-flex flex-grow-1 justify-content-center align-items-center" p-5 mt-5 mb-5>
-    <form>
-      <div class="mb-3">
-      <label for"firstNameInput" class="form-label"></label>
-      <input type="text" id=firstNameInput class="form-control" placeholder="First Name">
-    </div>
-    <div class="mb-3">
-      <label for"lastNameInput" class="form-label"></label>
-      <input type="text" id=lastNameInput class="form-control" placeholder="Last Name">
-    </div>
-    <div class="mb-3">
-      <label for"addressInput" class="form-label"></label>
-      <input type="text" id=addressInput class="form-control" placeholder="E-mail">
-    </div>
-    <div class="mb-3">
-      <label for"passwordInput" class="form-label"></label>
-      <input type="password" id=passwordInput class="form-control" placeholder="Password">
-    </div>
-    <div class="mb-3">
-      <label for"confirmPasswordInput" class="form-label"></label>
-      <input type="password" id=confirmPasswordInput class="form-control" placeholder="Confirm Password">
-      <div id="passwordHelpBlock" class="form-text">
-      <!--Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.-->
-    </div> 
-    <div class="mb-3">
-      <label for"bankInstituteName" class="form-label"></label>
-      <input type="text" id=bankInstituteName class="form-control" placeholder="Bank Institution Name">
-    </div>
-    <div class="mb-3">
-      <label for"bankRoutingNumber" class="form-label"></label>
-      <input type="password" id=bankRoutingNumber class="form-control" placeholder="Bank Routing Number">
-    </div>
-    <div class="mb-3">
-      <label for"bankAccountNumber" class="form-label"></label>
-      <input type="password" id=bankAccountNumber class="form-control" placeholder="Bank Account Number">
-    </div>
-    <a type="button" class="btn btn-primary" href={{url_for('customer_home')}}
-      style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-      Create Account
-  </a>
-    </form>        
-</div> <!--end of register container div-->
+  <div class="register-container d-flex flex-grow-1 justify-content-center align-items-center" p-5 mt-5 mb-5>
+      <form>
+        <div class="mb-3">
+          <label for"firstNameInput" class="form-label"></label>
+          <input type="text" id=firstNameInput class="form-control" placeholder="First Name">
+        </div>
+        <div class="mb-3">
+          <label for"lastNameInput" class="form-label"></label>
+          <input type="text" id=lastNameInput class="form-control" placeholder="Last Name">
+        </div>
+        <div class="mb-3">
+          <label for"addressInput" class="form-label"></label>
+          <input type="text" id=addressInput class="form-control" placeholder="E-mail">
+        </div>
+        <div class="mb-3">
+          <label for"passwordInput" class="form-label"></label>
+          <input type="password" id=passwordInput class="form-control" placeholder="Password">
+        </div>
+        <div class="mb-3">
+          <label for"confirmPasswordInput" class="form-label"></label>
+          <input type="password" id=confirmPasswordInput class="form-control" placeholder="Confirm Password">
+          <div id="passwordHelpBlock" class="form-text">
+          <!--Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.-->
+        </div> 
+        <div class="mb-3">
+          <label for"bankInstituteName" class="form-label"></label>
+          <input type="text" id=bankInstituteName class="form-control" placeholder="Bank Institution Name">
+        </div>
+        <div class="mb-3">
+          <label for"bankRoutingNumber" class="form-label"></label>
+          <input type="password" id=bankRoutingNumber class="form-control" placeholder="Bank Routing Number">
+        </div>
+        <div class="mb-3">
+          <label for"bankAccountNumber" class="form-label"></label>
+          <input type="password" id=bankAccountNumber class="form-control" placeholder="Bank Account Number">
+        </div>
+        <a type="button" class="btn btn-primary" href={{url_for('customer_home')}}
+          style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+          Create Account
+        </a>
+      </form>        
+  </div> <!--end of register container div-->
 </body>
+</html>
