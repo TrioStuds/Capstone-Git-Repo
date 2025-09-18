@@ -10,5 +10,9 @@ def login():
 def customer_home():
     return render_template('customer_home.html')
 
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
