@@ -21,18 +21,39 @@
                     <div class="line-graph">Graph</div>
                 </div>
             </div>
-            <div class="info-section">
-                <div class="border border-light rounded p-3 mb-3 d-flex flex-column align-items-center" style="width: 350px; height: 200px; background-color: rgba(128, 0, 128, 0.15);">
-                    <h2 class="mt-1 mb-3">Upcoming Activity</h2>
-                    <div class="align-self-start fs-6">Trades</div>
-                    <div class="align-self-start fs-6">Transfers</div>
+            <div class="info-section">  
+                <!-- Top row: Charts -->
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <!-- Pie Chart -->
+                    <canvas id="pieChart"></canvas>
+                  </div>
+                <div class="col-md-6">
+                  <!-- Line Graph -->
+                  <canvas id="lineChart"></canvas>
                 </div>
-                <div class="border border-light rounded p-3 mb-3 d-flex flex-column align-items-center" style="width: 350px; height: 200px; background-color: rgba(128, 0, 128, 0.15);">    
-                    <h2>Current Value</h2>
-                    <ul>
+            </div>
+
+                <!-- Bottom row: Upcoming Activity and Current Value side by side -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <!-- Upcoming Activity box (left) -->
+                    <div class="border border-light rounded p-3 mb-3 d-flex flex-column align-items-center" style="height: 250px; background-color: rgba(128, 0, 128, 0.15);">
+                      <h2 class="mt-2 mb-3">Upcoming Activity</h2>
+                      <div class="align-self-start fs-6">Trades</div>
+                      <div class="align-self-start fs-6">Transfers</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Current Value box (right) -->
+                    <div class="border border-light rounded p-3 mb-3 d-flex flex-column align-items-center" style="height: 250px;">
+                      <h2 class="mt-2 mb-3">Current Value</h2>
+                      <ul class="align-self-start fs-6">
                         <li>NVDA: $32,583</li>
                         <li>TSLA: $15,243</li>
-                    </ul>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
                 <div class="portfolio-summary">
                     <h2>John's Portfolio</h2>
