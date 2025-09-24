@@ -128,6 +128,31 @@ class Administrator(db.Model):
 
     def __repr__(self):
         return f"<Administrator {self.email}>"
+    
+class MarketHours(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
+    open_time = db.Column(db.Time, nullable=False)
+    close_time = db.Column(db.Time, nullable=False)
+
+    market = db.relationship('StockMarket', backref='hours')
+
+    def __repr__(self):
+        return f"<MarketHours {self.market.name} {self.open_time}-{self.close_time}>"
+
+class MarketSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    is_holiday = db.Column(db.Boolean, default=False)
+    note = db.Column(db.String(255))
+
+    market = db.relationship('StockMarket', backref='schedule')
+
+    def __repr__(self):
+        status = "Holiday" if self.is_holiday else "Open"
+        return f"<MarketSchedule {self.market.name} {self.start_date} to {self.end_date} ({status})>"
 
 with app.app_context():
     db.create_all()
