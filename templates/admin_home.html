@@ -7,18 +7,165 @@
     <div class="dashboard-container">
         <div class="main-content">
             <h1>Welcome back!</h1>
-            <p class="h2">Admin Home Page</p>
-            <div class="portfolio-section">
-                <div class="portfolio-chart">
-                    <div class="circle-chart">Chart</div>
-                    <div class="portfolio-actions">
-                        <button>Add/Remove Stock</button>
-                        <button>Change Market Hours</button>
-                        <button>Change Market Schedule</button>
+            <p class="h2">Admin Dashboard</p>
+        </div>
+        <!-- Bootstrap row container -->
+         <div class="row">
+            <!-- Left column: Creating Stocks -->
+             <div class="col-md-6 mb-4">
+                <div class="card" style="background-color: rgba(128, 0, 128, 0.8);">
+                    <div class="card-header">
+                        <h5 class="text-white mb-0">Create Stocks</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- First row of inputs fields -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <input type="text" class="form-control" placeholder="Name">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control" placeholder="Ticker">
+                            </div>
+                        </div>
+                        <!-- Second row of inputs fields -->
+                         <div class="row mb-3">
+                            <div class="col-6">
+                                <input type="text" class="form-control" placeholder="Price">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control" placeholder="Volume">
+                            </div>
+                         </div>
+                         <!-- Submit button for creating new stock -->   
+                         <button class="btn btn-success">Create</button>
                     </div>
                 </div>
-                <div class="portfolio-graph">
-                    <div class="line-graph">Graph</div>
+         </div>
+
+         <!-- Right column : Market Schedule -->
+         <div class="col-md-6 mb-4">
+            <div class="card" style="background-color: rgba(128, 0, 128, 0.8)">
+                <div class="card-header">
+                    <h5 class="text-white mb-0">Set Market Schedule</h5>
+                </div>
+                <!-- Card body containing all form elements -->
+                <div class="card-body">
+                    <!-- Current schedule display section -->
+                    <div class="mb-3">
+                        <label class="form-label text-white">Current Market Schedule</label>
+                        <input type="text" class="form-control" value="Monday - Friday" readonly>
+                    </div>
+                    <!-- Holiday exclusion dropdown section -->
+                    <div class="mb-3">
+                        <label class="form-label text-white">Exclude Dates</label>
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                Select holidays to exclude
+                            </button>
+                            <ul class="dropdown-menu w-100">
+                                <li><a class="dropdown-item" href="#">New Year's Day (January 1)</a></li>
+                                <li><a class="dropdown-item" href="#">Martin Luther King Jr. Day (3rd Monday in January)</a></li>
+                                <li><a class="dropdown-item" href="#">Washington's Birthday / Presidents' Day (3rd Monday in February)</a></li>
+                                <li><a class="dropdown-item" href="#">Memorial Day (Last Monday in May)</a></li>
+                                <li><a class="dropdown-item" href="#">Juneteenth (June 19)</a></li>
+                                <li><a class="dropdown-item" href="#">Independence Day (July 4)</a></li>
+                                <li><a class="dropdown-item" href="#">Labor Day (1st Monday in September)</a></li>
+                                <li><a class="dropdown-item" href="#">Columbus Day (2nd Monday in October)</a></li>
+                                <li><a class="dropdown-item" href="#">Veterans Day (November 11)</a></li>
+                                <li><a class="dropdown-item" href="#">Thanksgiving Day (4th Thursday in November)</a></li>
+                                <li><a class="dropdown-item" href="#">Christmas Day (December 25)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="btn btn-success">Confirm</button>
+                </div>
+            </div>
+         </div>
+    </div>
+
+    <!-- Bottom row: Market Hours Card -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card" style="background-color: rgba(128, 0, 128, 0.8)">
+                <div class="card-header">
+                    <h5 class="text-white mb-0">Set Market Hours</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Current market hours display -->
+                    <div class="mb-3">
+                        <label class="form-label text-white">Current Market Hours</label>
+                        <!-- DATABASE: Pull current hours from market_settings table -->
+                        <input type="text" class="form-control" value="9:00 AM - 5:00 PM" readonly>
+                    </div>
+                    
+                    <!-- Market hours modification section -->
+                    <div class="mb-3">
+                        <label class="form-label text-white">Modify Market Hours</label>
+                        <div class="row">
+                            <!-- Opening time dropdowns -->
+                            <div class="col-md-3">
+                                <label class="form-label text-white small">Opening Hour</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                        9:00
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">6:00</a></li>
+                                        <li><a class="dropdown-item" href="#">7:00</a></li>
+                                        <li><a class="dropdown-item" href="#">8:00</a></li>
+                                        <li><a class="dropdown-item" href="#">9:00</a></li>
+                                        <li><a class="dropdown-item" href="#">10:00</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label text-white small">AM/PM</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                        AM
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">AM</a></li>
+                                        <li><a class="dropdown-item" href="#">PM</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- Closing time dropdowns -->
+                            <div class="col-md-3">
+                                <label class="form-label text-white small">Closing Hour</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                        5:00
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">3:00</a></li>
+                                        <li><a class="dropdown-item" href="#">4:00</a></li>
+                                        <li><a class="dropdown-item" href="#">5:00</a></li>
+                                        <li><a class="dropdown-item" href="#">6:00</a></li>
+                                        <li><a class="dropdown-item" href="#">7:00</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label text-white small">AM/PM</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                        PM
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">AM</a></li>
+                                        <li><a class="dropdown-item" href="#">PM</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DATABASE: Save new hours to market_settings table -->
+                    <button class="btn btn-success">Update Hours</button>
                 </div>
             </div>
         </div>
