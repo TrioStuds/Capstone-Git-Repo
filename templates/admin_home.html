@@ -1,0 +1,27 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Admin Home{% endblock %}
+
+{% block content %}
+<body class="text-white">
+    <div class="dashboard-container">
+        <div class="main-content">
+            <h1>Welcome back!</h1>
+            <p class="h2">Admin Home Page</p>
+            <div class="portfolio-section">
+                <div class="portfolio-chart">
+                    <div class="circle-chart">Chart</div>
+                    <div class="portfolio-actions">
+                        <button>Add/Remove Stock</button>
+                        <button>Change Market Hours</button>
+                        <button>Change Market Schedule</button>
+                    </div>
+                </div>
+                <div class="portfolio-graph">
+                    <div class="line-graph">Graph</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}
