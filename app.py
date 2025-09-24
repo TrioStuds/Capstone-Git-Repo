@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from decimal import Decimal
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -92,8 +93,9 @@ class OrderHistory(db.Model):
     order_type = db.Column(db.Enum('BUY', 'SELL', name='order_type_enum'), nullable=False)
     quantity = db.Column(db.Numeric(10, 2), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
-    total_cost = db.Column(db.Numeric(12, 2), nullable=False)  # quantity * price
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)
+    total_cost = db.Column(db.Numeric(12, 2), nullable=False)
+    order_placed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    executed = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', back_populates='orders')
     stock = db.relationship('StockInventory')
@@ -148,8 +150,10 @@ def login():
         admin = Administrator.query.filter_by(email=email, password=password).first()
 
         if user:
+            session['user_id'] = user.id
             return redirect(url_for('customer_home'))
         elif admin:
+            session['admin_id'] = admin.id
             return redirect(url_for('admin_home'))
         else:
             flash('Invalid email or password', 'danger')
@@ -157,9 +161,112 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/customer_home')
+@app.route('/customer_home', methods=['GET', 'POST'])
 def customer_home():
-    return render_template('customer_home.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first", "warning")
+        return redirect(url_for('login'))
+
+    user = User.query.get(user_id)
+
+    if request.method == 'POST':
+        stock_id = request.form.get('stock_id')
+        quantity = Decimal(request.form.get('quantity', 0))
+        action = request.form.get('action')  # "buy" or "sell"
+
+        stock = StockInventory.query.get(stock_id)
+        if not stock:
+            flash("Stock not found.", "danger")
+            return redirect(url_for('customer_home'))
+
+        if action == "buy":
+            total_cost = stock.price * quantity
+
+            # Update portfolio
+            portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
+            if portfolio_entry:
+                old_total_value = portfolio_entry.avg_purchase_price * portfolio_entry.quantity
+                new_total_value = old_total_value + total_cost
+                portfolio_entry.quantity += quantity
+                portfolio_entry.avg_purchase_price = new_total_value / portfolio_entry.quantity
+            else:
+                portfolio_entry = Portfolio(
+                    user_id=user.id,
+                    stock_id=stock.id,
+                    quantity=quantity,
+                    avg_purchase_price=stock.price
+                )
+                db.session.add(portfolio_entry)
+
+            # Record order and transaction
+            order = OrderHistory(
+                user_id=user.id,
+                stock_id=stock.id,
+                order_type="BUY",
+                quantity=quantity,
+                price=stock.price,
+                total_cost=total_cost,
+                order_placed_at=datetime.utcnow(),
+                executed=True
+            )
+            db.session.add(order)
+
+            transaction = FinancialTransaction(
+                user_id=user.id,
+                amount=total_cost,
+                transaction_type="WITHDRAWAL",
+                related_order=order
+            )
+            db.session.add(transaction)
+            db.session.commit()
+
+            flash(f"Successfully bought {quantity} of {stock.ticker_symbol}", "success")
+            return redirect(url_for('customer_home'))
+
+        elif action == "sell":
+            portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
+            if not portfolio_entry or portfolio_entry.quantity < quantity:
+                flash("Not enough stock to sell", "danger")
+                return redirect(url_for('customer_home'))
+
+            total_sale = stock.price * quantity
+            portfolio_entry.quantity -= quantity
+            if portfolio_entry.quantity <= 0:
+                db.session.delete(portfolio_entry)
+
+            # Record order and transaction
+            order = OrderHistory(
+                user_id=user.id,
+                stock_id=stock.id,
+                order_type="SELL",
+                quantity=quantity,
+                price=stock.price,
+                total_cost=total_sale,
+                order_placed_at=datetime.utcnow(),
+                executed=True
+            )
+            db.session.add(order)
+
+            transaction = FinancialTransaction(
+                user_id=user.id,
+                amount=total_sale,
+                transaction_type="DEPOSIT",
+                related_order=order
+            )
+            db.session.add(transaction)
+            db.session.commit()
+
+            flash(f"Successfully sold {quantity} of {stock.ticker_symbol}", "success")
+            return redirect(url_for('customer_home'))
+
+    stocks = StockInventory.query.all()
+
+    return render_template(
+        'customer_home.html',
+        user=user,
+        stocks=stocks
+    )
 
 @app.route('/admin_home')
 def admin_home():
