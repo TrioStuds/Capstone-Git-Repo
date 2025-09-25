@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/vpn_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'vpn_secret_key'\
+app.config['SECRET_KEY'] = 'vpn_secret_key'
 
 db = SQLAlchemy(app)
 
@@ -30,8 +30,8 @@ class BankInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     institute_name = db.Column(db.String(100))
-    routing_number = db.Column(db.String(20))
-    account_number = db.Column(db.String(20))
+    routing_number = db.Column(db.Integer())
+    account_number = db.Column(db.Integer())
 
     def __repr__(self):
         return f"<User {User.email}"
@@ -58,7 +58,7 @@ class StockMarket(db.Model):
     
 class StockInventory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ticker_symbol = db.Column(db.String(10), nullable=False)
+    ticker_symbol = db.Column(db.String(10), unique=True, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
 
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
@@ -295,6 +295,10 @@ def customer_home():
 
 @app.route('/admin_home')
 def admin_home():
+    admin_id = session.get('admin_id')
+    if not admin_id:
+        flash("Please log in first", "warning")
+        return redirect(url_for('login'))
     return render_template('admin_home.html')
 
 @app.route('/register', methods=['GET', 'POST'])
