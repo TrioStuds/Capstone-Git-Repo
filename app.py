@@ -172,6 +172,7 @@ def customer_home():
         return redirect(url_for('login'))
 
     user = User.query.get(user_id)
+    portfolio = Portfolio.query.filter_by(user_id=user.id).all()
 
     if request.method == 'POST':
         stock_id = request.form.get('stock_id')
@@ -185,47 +186,52 @@ def customer_home():
 
         if action == "buy":
             total_cost = stock.price * quantity
-
-            # Update portfolio
-            portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
-            if portfolio_entry:
-                old_total_value = portfolio_entry.avg_purchase_price * portfolio_entry.quantity
-                new_total_value = old_total_value + total_cost
-                portfolio_entry.quantity += quantity
-                portfolio_entry.avg_purchase_price = new_total_value / portfolio_entry.quantity
+            
+            if total_cost > user.cash:
+                flash("Insufficient funds.", "danger")
+                return redirect(url_for('customer_home'))
+            
             else:
-                portfolio_entry = Portfolio(
+                # Update portfolio
+                portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
+                if portfolio_entry:
+                    old_total_value = portfolio_entry.avg_purchase_price * portfolio_entry.quantity
+                    new_total_value = old_total_value + total_cost
+                    portfolio_entry.quantity += quantity
+                    portfolio_entry.avg_purchase_price = new_total_value / portfolio_entry.quantity
+                else:
+                    portfolio_entry = Portfolio(
+                        user_id=user.id,
+                        stock_id=stock.id,
+                        quantity=quantity,
+                        avg_purchase_price=stock.price
+                    )
+                    db.session.add(portfolio_entry)
+
+                # Record order and transaction
+                order = OrderHistory(
                     user_id=user.id,
                     stock_id=stock.id,
+                    order_type="BUY",
                     quantity=quantity,
-                    avg_purchase_price=stock.price
+                    price=stock.price,
+                    total_cost=total_cost,
+                    order_placed_at=datetime.utcnow(),
+                    executed=True
                 )
-                db.session.add(portfolio_entry)
+                db.session.add(order)
 
-            # Record order and transaction
-            order = OrderHistory(
-                user_id=user.id,
-                stock_id=stock.id,
-                order_type="BUY",
-                quantity=quantity,
-                price=stock.price,
-                total_cost=total_cost,
-                order_placed_at=datetime.utcnow(),
-                executed=True
-            )
-            db.session.add(order)
+                transaction = FinancialTransaction(
+                    user_id=user.id,
+                    amount=total_cost,
+                    transaction_type="WITHDRAWAL",
+                    related_order=order
+                )
+                db.session.add(transaction)
+                db.session.commit()
 
-            transaction = FinancialTransaction(
-                user_id=user.id,
-                amount=total_cost,
-                transaction_type="WITHDRAWAL",
-                related_order=order
-            )
-            db.session.add(transaction)
-            db.session.commit()
-
-            flash(f"Successfully bought {quantity} of {stock.ticker_symbol}", "success")
-            return redirect(url_for('customer_home'))
+                flash(f"Successfully bought {quantity} of {stock.ticker_symbol}", "success")
+                return redirect(url_for('customer_home'))
 
         elif action == "sell":
             portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
@@ -268,7 +274,8 @@ def customer_home():
     return render_template(
         'customer_home.html',
         user=user,
-        stocks=stocks
+        stocks=stocks,
+        portfolio=portfolio
     )
 
 @app.route('/admin_home', methods=['GET', 'POST'])
