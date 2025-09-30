@@ -9,6 +9,14 @@
             <h1>Welcome back!</h1>
             <p class="h2">Admin Dashboard</p>
         </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
         <!-- Bootstrap row container -->
          <div class="row">
             <!-- Left column: Creating Stocks -->
@@ -18,29 +26,35 @@
                         <h5 class="text-white mb-0">Create Stocks</h5>
                     </div>
                     <div class="card-body">
-                        <!-- First row of inputs fields -->
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <input type="text" class="form-control" placeholder="Name">
+                        <form method="POST" action="{{url_for('admin_home')}}">
+                            <!-- First row of inputs fields -->
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <input type="text" name="company_name" class="form-control" placeholder="Company Name" required>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" name="ticker" class="form-control" placeholder="Ticker" required>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <input type="text" class="form-control" placeholder="Ticker">
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <input type="number" step="0.01" name="price" class="form-control" placeholder="Price" required>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" name="industry" class="form-control" placeholder="Industry">
+                                </div>
                             </div>
-                        </div>
-                        <!-- Second row of inputs fields -->
-                         <div class="row mb-3">
-                            <div class="col-6">
-                                <input type="text" class="form-control" placeholder="Price">
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <input type="text" name="country" class="form-control" placeholder="Country" required>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <input type="text" class="form-control" placeholder="Volume">
-                            </div>
-                         </div>
-                         <!-- Submit button for creating new stock -->   
-                         <button class="btn btn-success">Create</button>
+                            <!-- Submit button for creating new stock -->   
+                            <button class="btn btn-success">Create</button>
+                        </form>
                     </div>
                 </div>
-         </div>
+            </div>
 
          <!-- Right column : Market Schedule -->
          <div class="col-md-6 mb-4">

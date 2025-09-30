@@ -10,25 +10,25 @@
 <body>
   <div class="container-fluid">
     <div class="row align-items-start">
-      <div class="col-2 ps-0 bg-dark min-vh-100">
-          <nav class="nav flex-column bg-dark">
-          <a class="nav-link active btn btn-primary" aria-current="page" href="#">Dashboard</a>
-          <a class="nav-link btn btn-primary" href="#">Deposit</a>
-          <a class="nav-link btn btn-primary" href="#">Withdraw</a>
-          <a class="nav-link btn btn-primary" href="#">Transaction History</a>
-          <a class="nav-link btn btn-primary" href="#">Settings</a>
-          <a class="nav-link btn btn-primary" href="{{url_for('login')}}">Log Out</a>
-        </nav>
+      <div class="col-2 ps-0 bg-dark min-vh-100" style="background: linear-gradient(180deg, #141414, #616161);">
+          <nav class="nav flex-column">
+            <a class="nav-link btn btn-primary {% if request.endpoint == 'customer_home' %}active{% endif %}" href="{{ url_for('customer_home') }}">Dashboard</a>
+            <a class="nav-link btn btn-primary {% if request.endpoint == 'deposit' %}active{% endif %}" href="{{ url_for('deposit') }}">Deposit</a>
+            <a class="nav-link btn btn-primary {% if request.endpoint == 'withdraw' %}active{% endif %}" href="{{ url_for('withdraw') }}">Withdraw</a>
+            <a class="nav-link btn btn-primary {% if request.endpoint == 'transactions' %}active{% endif %}" href="{{ url_for('transactions') }}">Transaction History</a>
+            <a class="nav-link btn btn-primary {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}">Settings</a>
+            <a class="nav-link btn btn-primary" href="{{ url_for('login') }}">Log Out</a>
+          </nav>
+
       </div>
-      <div class="col-10 min-vh-100" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
+      <div class="col-10 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
           {% block content %}{% endblock %}
+          <footer class="text-light mt-auto">
+            <div class="py-3"><p class="text-center mb-0">© 2025 VPN Trading</p></div>
+          </footer>
       </div>
     </div>
   </div>
-
-  <footer class="bg-dark text-light">
-    <div class="container py-3"><p class="text-center mb-0">© 2025 VPN Trading</p></div>
-  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- <script src="{{ url_for('static', filename='js/script.js') }}"></script> -->

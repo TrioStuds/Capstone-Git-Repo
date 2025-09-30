@@ -17,6 +17,7 @@ class User(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
+    cash = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
     banks = db.relationship('BankInfo', backref='user', lazy=True)
     portfolio = db.relationship('Portfolio', back_populates='user', lazy=True)
@@ -34,53 +35,33 @@ class BankInfo(db.Model):
     account_number = db.Column(db.Integer())
 
     def __repr__(self):
-        return f"<User {User.email}"
+        if self.user:
+            return f"<BankInfo id={self.id} user_email={self.user.email}>"
+        return f"<BankInfo id={self.id} user_id={self.user_id}>"
     
-class Company(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    industry = db.Column(db.String(100))
-
-    stocks = db.relationship('StockInventory', back_populates='company', lazy=True)
-
-    def __repr__(self):
-        return f"<Company {self.name}>"
-        
 class StockMarket(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    id = db.Column(db.Integer, primary_key=True) 
+    ticker_symbol = db.Column(db.String(4), unique=True, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
+    company_name = db.Column(db.String(150), nullable=False)
+    industry = db.Column(db.String(100))
     country = db.Column(db.String(50), nullable=False)
 
-    stocks = db.relationship('StockInventory', back_populates='market', lazy=True)
-
-    def __repr__(self):
-        return f"<StockMarket {self.name}>"
-    
-class StockInventory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    ticker_symbol = db.Column(db.String(10), unique=True, nullable=False)
-    price = db.Column(db.Numeric(10, 2), nullable=False)
-
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
-    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
-
-    company = db.relationship('Company', back_populates='stocks')
-    market = db.relationship('StockMarket', back_populates='stocks')
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
     def __repr__(self):
-        return f"<Stock {self.ticker_symbol}>"
+        return f"<Stock {self.ticker_symbol} ({self.company_name})>"
     
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock_inventory.id'), nullable=False)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
 
     quantity = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     avg_purchase_price = db.Column(db.Numeric(10, 2), nullable=False, default=0)
 
     user = db.relationship('User', back_populates='portfolio')
-    stock = db.relationship('StockInventory', back_populates='portfolio_entries')
+    stock = db.relationship('StockMarket', back_populates='portfolio_entries')
 
     def __repr__(self):
         return f"<Portfolio Stock={self.stock_id} Qty={self.quantity}>"
@@ -88,7 +69,7 @@ class Portfolio(db.Model):
 class OrderHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock_inventory.id'), nullable=False)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
 
     order_type = db.Column(db.Enum('BUY', 'SELL', name='order_type_enum'), nullable=False)
     quantity = db.Column(db.Numeric(10, 2), nullable=False)
@@ -98,7 +79,7 @@ class OrderHistory(db.Model):
     executed = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', back_populates='orders')
-    stock = db.relationship('StockInventory')
+    stock = db.relationship('StockMarket')
 
     def __repr__(self):
         return f"<Order {self.order_type} {self.quantity} {self.stock.ticker_symbol}>"
@@ -135,8 +116,6 @@ class MarketHours(db.Model):
     open_time = db.Column(db.Time, nullable=False)
     close_time = db.Column(db.Time, nullable=False)
 
-    market = db.relationship('StockMarket', backref='hours')
-
     def __repr__(self):
         return f"<MarketHours {self.market.name} {self.open_time}-{self.close_time}>"
 
@@ -147,8 +126,6 @@ class MarketSchedule(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     is_holiday = db.Column(db.Boolean, default=False)
     note = db.Column(db.String(255))
-
-    market = db.relationship('StockMarket', backref='schedule')
 
     def __repr__(self):
         status = "Holiday" if self.is_holiday else "Open"
@@ -200,7 +177,7 @@ def customer_home():
         quantity = Decimal(request.form.get('quantity', 0))
         action = request.form.get('action')  # "buy" or "sell"
 
-        stock = StockInventory.query.get(stock_id)
+        stock = StockMarket.query.get(stock_id)
         if not stock:
             flash("Stock not found.", "danger")
             return redirect(url_for('customer_home'))
@@ -285,7 +262,7 @@ def customer_home():
             flash(f"Successfully sold {quantity} of {stock.ticker_symbol}", "success")
             return redirect(url_for('customer_home'))
 
-    stocks = StockInventory.query.all()
+    stocks = StockMarket.query.all()
 
     return render_template(
         'customer_home.html',
@@ -293,12 +270,34 @@ def customer_home():
         stocks=stocks
     )
 
-@app.route('/admin_home')
+@app.route('/admin_home', methods=['GET', 'POST'])
 def admin_home():
     admin_id = session.get('admin_id')
     if not admin_id:
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        company_name = request.form.get('company_name')
+        ticker = request.form.get('ticker')
+        price = request.form.get('price')
+        industry = request.form.get('industry')
+        country = request.form.get('country')
+
+        new_stock = StockMarket(
+            company_name=company_name,
+            ticker_symbol=ticker,
+            price=price,
+            industry=industry,
+            country=country,
+        )
+
+        db.session.add(new_stock)
+        db.session.commit()
+
+        flash(f"Stock {ticker} created successfully!", "success")
+        return redirect(url_for('admin_home'))
+
     return render_template('admin_home.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -346,6 +345,22 @@ def register():
         return redirect(url_for('customer_home'))
 
     return render_template('register.html')
+
+@app.route('/deposit')
+def deposit():
+    return render_template('deposit.html')
+
+@app.route('/withdraw')
+def withdraw():
+    return render_template('withdraw.html')
+
+@app.route('/transactions')
+def transactions():
+    return render_template('transactions.html')
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
