@@ -2,11 +2,12 @@
 
 {% block title %}Settings{% endblock %}
 
+{% block page_header %}Settings{% endblock %}
+
 {% block content %}
 <body class="text-white">
     <div class="dashboard-container">
         <div class="main-content text-center mt-4">
-            <h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 300; letter-spacing: -0.5px;">Settings</h1>
 
             <!-- Settings Grid -->
             <div class="container mt-4">
@@ -17,7 +18,20 @@
                             <div class="border border-light rounded  d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
                                 <h2 class="mt-2 mb-4">Personal Information</h2>
                                 <div class="card-body w-100">
+                                    <!-- Alert Messages -->
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                        {% if messages %}
+                                            {% for category, message in messages %}
+                                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                                    {{ message }}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %}
+
                                     <form method="POST" action="{{ url_for('settings') }}">
+                                        <input type="hidden" name="form_type" value="personal">
                                         <div class="mb-3 row align-items-center">
                                             <label class="col-sm-4 text-end">First Name:</label>
                                             <div class="col-sm-8">
