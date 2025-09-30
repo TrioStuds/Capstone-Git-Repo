@@ -33,6 +33,7 @@ class BankInfo(db.Model):
     institute_name = db.Column(db.String(100))
     routing_number = db.Column(db.Integer())
     account_number = db.Column(db.Integer())
+    funds = db.Column(db.Numeric(12, 2), nullable=False, default=10000)
 
     def __repr__(self):
         if self.user:
