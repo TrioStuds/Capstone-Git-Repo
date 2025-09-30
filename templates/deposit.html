@@ -7,40 +7,46 @@
 {% block content %}
 <body class="text-white">
     <div class="dashboard-container">
-        <div class="main-content">
+        <div class="main-content row justify-content-center">
             <h1>Transfer Funds</h1>
-                <div class="deposit-section">
-                    <div class="row mb-3">
-                        <label for="inputAmount" class="col-sm-2 col-form-label">Amount</label>
-                    <div class="col-sm-10">
-                    <input type="email" class="form-control" id="inputAmount">
+            <div class="col-md-6">
+                <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
+                    <div class="card-body w-100">
+                        <form>
+                            <div class="deposit-section">
+                                <div class="row mb-3">
+                                    <label for="inputAmount" class="col-sm-2 col-form-label">Amount</label>
+                                    <div class="col-sm-10">
+                                        <input type="email" class="form-control" id="inputAmount">
+                                    </div>
+                                </div>
+                            <div class="row mb-3">
+                                <label for="inputFrom" class="col-sm-2 col-form-label">From</label>
+                                <div class="col-sm-10">
+                                    <!-- replaced the empty text input with the select element and fixed option tags -->
+                                    <select id="inputFrom" class="form-select" aria-label="Select account">
+                                        <option value="" selected>Select Account</option>
+                                        <option value="1">Active Duty Checking - Checking 12345</option>
+                                        <option value="2">Active Duty Savings - Savings 67890</option>
+                                        <option value="3">CryptoWallet - BTC - B3AFD120CF0</option>
+                                    </select>    
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="inputFreq" class="col-sm-2 col-form-label">Frequency</label>
+                                <div class="col-sm-10">
+                                    <select id="inputFreq" class="form-select" aria-label="Select account">
+                                        <option value="" selected>Select Frequency</option>
+                                        <option value="1">Once</option>
+                                        <option value="2">Weekly</option>
+                                        <option value="3">Monthly</option>
+                                    </select>    
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                        </div>
-                <div class="row mb-3">
-                    <label for="inputFrom" class="col-sm-2 col-form-label">From</label>
-                        <div class="col-sm-10">
-                            <!-- ...existing code... -->
-                            <!-- replaced the empty text input with the select element and fixed option tags -->
-                            <select id="inputFrom" class="form-select" aria-label="Select account">
-                                <option value="" selected>Select Account</option>
-                                <option value="1">Active Duty Checking - Checking 12345</option>
-                                <option value="2">Active Duty Savings - Savings 67890</option>
-                                <option value="3">CryptoWallet - BTC - B3AFD120CF0</option>
-                            </select>    
-                        </div>
                 </div>
-                <div class="row mb-3">
-                    <label for="inputFreq" class="col-sm-2 col-form-label">Frequency</label>
-                        <div class="col-sm-10">
-                            <select id="inputFreq" class="form-select" aria-label="Select account">
-                                <option value="" selected>Select Frequency</option>
-                                <option value="1">Once</option>
-                                <option value="2">Weekly</option>
-                                <option value="3">Monthly</option>
-                            </select>    
-                        </div>
-                </div>
-
+            </div>
         </div>
     </div>
 </body>
