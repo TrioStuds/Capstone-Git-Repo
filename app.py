@@ -358,9 +358,41 @@ def withdraw():
 def transactions():
     return render_template('transactions.html')
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 def settings():
-    return render_template('settings.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first", "warning")
+        return redirect(url_for('login'))
+
+    user = User.query.get(user_id)
+
+    if request.method == 'POST':
+        # Get the form data
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+
+        # Check if email is being changed and if it's already in use
+        if email != user.email and User.query.filter_by(email=email).first():
+            flash("Email already in use!", "danger")
+            return redirect(url_for('settings'))
+
+        # Update user information
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+
+        try:
+            db.session.commit()
+            flash("Settings updated successfully!", "success")
+        except:
+            db.session.rollback()
+            flash("An error occurred while updating settings.", "danger")
+
+        return redirect(url_for('settings'))
+
+    return render_template('settings.html', user=user)
 
 if __name__ == '__main__':
     app.run(debug=True)
