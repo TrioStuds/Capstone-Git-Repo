@@ -14,7 +14,7 @@
           <nav class="nav flex-column">
           <a class="nav-link btn btn-primary {% if request.endpoint == 'admin_home' %}active{% endif %}" href="{{ url_for('admin_home') }}">Dashboard</a>
           <a class="nav-link btn btn-primary {% if request.endpoint == 'admin_settings' %}active{% endif %}" href="{{ url_for('admin_settings') }}">Settings</a>
-          <a class="nav-link btn btn-primary" href="{{url_for('login')}}">Log Out</a>
+          <a class="nav-link btn btn-primary" href="{{url_for('logout')}}">Log Out</a>
         </nav>
       </div>
       <div class="col-10 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">

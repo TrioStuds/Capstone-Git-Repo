@@ -17,7 +17,7 @@
             <a class="nav-link btn btn-primary {% if request.endpoint == 'withdraw' %}active{% endif %}" href="{{ url_for('withdraw') }}">Withdraw</a>
             <a class="nav-link btn btn-primary {% if request.endpoint == 'transactions' %}active{% endif %}" href="{{ url_for('transactions') }}">Transaction History</a>
             <a class="nav-link btn btn-primary {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}">Settings</a>
-            <a class="nav-link btn btn-primary" href="{{ url_for('login') }}">Log Out</a>
+            <a class="nav-link btn btn-primary" href="{{ url_for('logout') }}">Log Out</a>
           </nav>
       </div>
       <div class="col-10 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">

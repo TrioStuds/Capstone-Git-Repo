@@ -313,6 +313,9 @@ def admin_home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+
+        session.clear()
+
         first_name = request.form['first_name']
         last_name = request.form['last_name']
         email = request.form['email']
@@ -348,16 +351,16 @@ def register():
                 routing_number=bank_routing_number,
                 account_number=bank_account_number
             )
+
+            session['user_id'] = new_user.id
+
             db.session.add(new_bank)
             db.session.commit()
 
         flash("Account created successfully!", "success")
-        return redirect(url_for('customer_home'))
+        return redirect(url_for('login'))
 
     return render_template('register.html')
-
-from decimal import Decimal
-from flask import request, session, flash, redirect, url_for
 
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
@@ -396,8 +399,8 @@ def deposit():
                 transaction_type="DEPOSIT",
                 related_order=None
             )
-            db.session.add(transaction)
 
+            db.session.add(transaction)
             db.session.commit()
 
             flash(f"Successfully deposited ${amount} from {bank_account.institute_name}", "success")
@@ -524,6 +527,13 @@ def admin_settings():
             flash("An error occurred while updating admin email.", "danger")
 
     return render_template("admin_settings.html", admin=admin)
+
+@app.route('/logout')
+def logout():
+    session.clear()  # This clears all session data
+    flash("You have been logged out.", "info")
+    return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
