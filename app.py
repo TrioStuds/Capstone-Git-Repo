@@ -467,7 +467,15 @@ def withdraw():
 
 @app.route('/transactions')
 def transactions():
-    return render_template('transactions.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first", "warning")
+        return redirect(url_for('login'))
+    
+    user = User.query.get(user_id)
+    transactions = FinancialTransaction.query.filter_by(user_id=user.id).order_by(FinancialTransaction.timestamp.desc()).all()
+    return render_template('transactions.html', user=user, transactions=transactions)
+    #return render_template('transactions.html')
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
