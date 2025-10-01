@@ -228,6 +228,7 @@ def customer_home():
                     related_order=order
                 )
                 db.session.add(transaction)
+                user.cash -= total_cost
                 db.session.commit()
 
                 flash(f"Successfully bought {quantity} of {stock.ticker_symbol}", "success")
@@ -264,6 +265,7 @@ def customer_home():
                 related_order=order
             )
             db.session.add(transaction)
+            user.cash += total_sale
             db.session.commit()
 
             flash(f"Successfully sold {quantity} of {stock.ticker_symbol}", "success")
@@ -354,9 +356,60 @@ def register():
 
     return render_template('register.html')
 
-@app.route('/deposit')
+from decimal import Decimal
+from flask import request, session, flash, redirect, url_for
+
+@app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
-    return render_template('deposit.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first", "warning")
+        return redirect(url_for('login'))
+
+    user = User.query.get(user_id)
+    bank_accounts = BankInfo.query.filter_by(user_id=user.id).all()
+
+    if request.method == 'POST':
+        try:
+            amount = Decimal(request.form.get('amount', 0))
+            bank_id = request.form.get('bank_id')
+
+            bank_account = BankInfo.query.filter_by(id=bank_id, user_id=user.id).first()
+            if not bank_account:
+                flash("Invalid bank account selected.", "danger")
+                return redirect(url_for('deposit'))
+
+            if amount <= 0:
+                flash("Deposit amount must be positive.", "danger")
+                return redirect(url_for('deposit'))
+
+            if amount > bank_account.funds:
+                flash("Insufficient funds in bank account.", "danger")
+                return redirect(url_for('deposit'))
+
+            bank_account.funds -= amount
+            user.cash += amount
+
+            transaction = FinancialTransaction(
+                user_id=user.id,
+                amount=amount,
+                transaction_type="DEPOSIT",
+                related_order=None
+            )
+            db.session.add(transaction)
+
+            db.session.commit()
+
+            flash(f"Successfully deposited ${amount} from {bank_account.institute_name}", "success")
+            return redirect(url_for('customer_home'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error processing deposit: {str(e)}", "danger")
+            return redirect(url_for('deposit'))
+
+    # Render form with only this user's banks
+    return render_template("deposit.html", user=user, bank_accounts=bank_accounts)
 
 @app.route('/withdraw')
 def withdraw():
@@ -376,27 +429,67 @@ def settings():
     user = User.query.get(user_id)
 
     if request.method == 'POST':
-        # Get the form data
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        email = request.form.get('email')
+        form_type = request.form.get('form_type')
 
-        # Check if email is being changed and if it's already in use
-        if email != user.email and User.query.filter_by(email=email).first():
-            flash("Email already in use!", "danger")
-            return redirect(url_for('settings'))
+        if form_type == 'personal':
+            # Get the form data
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            email = request.form.get('email')
 
-        # Update user information
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
+            # Check if email is being changed and if it's already in use
+            if email != user.email and User.query.filter_by(email=email).first():
+                flash("Email already in use!", "danger")
+                return redirect(url_for('settings'))
 
-        try:
-            db.session.commit()
-            flash("Settings updated successfully!", "success")
-        except:
-            db.session.rollback()
-            flash("An error occurred while updating settings.", "danger")
+            # Update user information
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+
+            try:
+                db.session.commit()
+                flash("Settings updated successfully!", "success")
+            except:
+                db.session.rollback()
+                flash("An error occurred while updating settings.", "danger")
+
+        elif form_type == 'bank':
+            # Get bank form info
+            institute_name = request.form.get('institute_name')
+            routing_number = request.form.get('routing_number')
+            account_number = request.form.get('account_number')
+
+            if not (institute_name and routing_number and account_number):
+                flash("Please fill out all bank fields.", "danger")
+                return redirect(url_for('settings'))
+
+            # check if bank account already exists
+            existing_bank = BankInfo.query.filter_by(
+                user_id=user.id,
+                institute_name=institute_name,
+                routing_number=routing_number,
+                account_number=account_number
+            ).first()
+
+            if existing_bank:
+                flash("This bank account is already added.", "warning")
+                return redirect(url_for('settings'))
+
+            new_bank = BankInfo(
+                user_id=user.id,
+                institute_name=institute_name,
+                routing_number=routing_number,
+                account_number=account_number
+            )
+            db.session.add(new_bank)
+
+            try:
+                db.session.commit()
+                flash("Bank account added successfully!", "success")
+            except:
+                db.session.rollback()
+                flash("An error occurred while adding the bank account.", "danger")
 
         return redirect(url_for('settings'))
 

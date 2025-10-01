@@ -9,40 +9,51 @@
     <div class="dashboard-container">
         <div class="main-content row justify-content-center">
             <h1>Transfer Funds</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"</button>
+                        </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
             <div class="col-md-6">
                 <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
                     <div class="card-body w-100">
-                        <form>
+                        <form method="POST" action="{{url_for('deposit')}}">
                             <div class="deposit-section">
                                 <div class="row mb-3">
                                     <label for="inputAmount" class="col-sm-2 col-form-label">Amount</label>
                                     <div class="col-sm-10">
-                                        <input type="email" class="form-control" id="inputAmount">
+                                        <input type="number" step="0.01" min="0" class="form-control" id="inputAmount" name="amount" required>
                                     </div>
                                 </div>
                             <div class="row mb-3">
                                 <label for="inputFrom" class="col-sm-2 col-form-label">From</label>
                                 <div class="col-sm-10">
-                                    <!-- replaced the empty text input with the select element and fixed option tags -->
-                                    <select id="inputFrom" class="form-select" aria-label="Select account">
+                                    <select id="inputFrom" name="bank_id" class="form-select" aria-label="Select account" required>
                                         <option value="" selected>Select Account</option>
-                                        <option value="1">Active Duty Checking - Checking 12345</option>
-                                        <option value="2">Active Duty Savings - Savings 67890</option>
-                                        <option value="3">CryptoWallet - BTC - B3AFD120CF0</option>
-                                    </select>    
+                                        {% for bank in bank_accounts %}
+                                            <option value="{{ bank.id }}">
+                                                {{ bank.institute_name }} - {{ bank.account_number }} (Available: ${{ "%.2f"|format(bank.funds) }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>     
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <!-- <div class="row mb-3">
                                 <label for="inputFreq" class="col-sm-2 col-form-label">Frequency</label>
                                 <div class="col-sm-10">
-                                    <select id="inputFreq" class="form-select" aria-label="Select account">
-                                        <option value="" selected>Select Frequency</option>
-                                        <option value="1">Once</option>
-                                        <option value="2">Weekly</option>
-                                        <option value="3">Monthly</option>
-                                    </select>    
+                                    <select id="inputFreq" name="frequency" class="form-select" aria-label="Select frequency">
+                                        <option value="once" selected>Once</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>   
                                 </div>
-                            </div>
+                            </div> -->
+                            <button type="submit" class="btn btn-light">Deposit</button>
                         </form>
                     </div>
                 </div>

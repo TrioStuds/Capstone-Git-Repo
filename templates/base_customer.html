@@ -9,8 +9,8 @@
 </head>
 <body>
   <div class="container-fluid">
-    <div class="row align-items-start">
-      <div class="col-2 ps-0 bg-dark min-vh-100" style="background: linear-gradient(180deg, #141414, #616161);">
+    <div class="row">
+      <div class="col-2 bg-dark min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #141414, #616161);">
           <nav class="nav flex-column">
             <a class="nav-link btn btn-primary {% if request.endpoint == 'customer_home' %}active{% endif %}" href="{{ url_for('customer_home') }}">Dashboard</a>
             <a class="nav-link btn btn-primary {% if request.endpoint == 'deposit' %}active{% endif %}" href="{{ url_for('deposit') }}">Deposit</a>
@@ -19,7 +19,6 @@
             <a class="nav-link btn btn-primary {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}">Settings</a>
             <a class="nav-link btn btn-primary" href="{{ url_for('login') }}">Log Out</a>
           </nav>
-
       </div>
       <div class="col-10 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
           <div class="text-center mt-4">
