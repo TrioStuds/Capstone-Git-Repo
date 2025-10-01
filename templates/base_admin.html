@@ -9,11 +9,11 @@
 </head>
 <body>
   <div class="container-fluid">
-    <div class="row align-items-start">
-      <div class="col-2 ps-0 bg-dark min-vh-100">
-          <nav class="nav flex-column bg-dark">
-          <a class="nav-link active btn btn-primary" aria-current="page" href="#">Dashboard</a>
-          <a class="nav-link btn btn-primary" href="#">Settings</a>
+    <div class="row">
+      <div class="col-2 ps-0 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #141414, #616161);">
+          <nav class="nav flex-column">
+          <a class="nav-link btn btn-primary {% if request.endpoint == 'admin_home' %}active{% endif %}" href="{{ url_for('admin_home') }}">Dashboard</a>
+          <a class="nav-link btn btn-primary {% if request.endpoint == 'admin_settings' %}active{% endif %}" href="{{ url_for('admin_settings') }}">Settings</a>
           <a class="nav-link btn btn-primary" href="{{url_for('login')}}">Log Out</a>
         </nav>
       </div>

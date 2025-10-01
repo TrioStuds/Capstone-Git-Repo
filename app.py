@@ -495,5 +495,35 @@ def settings():
 
     return render_template('settings.html', user=user)
 
+@app.route('/admin_settings', methods=['GET', 'POST'])
+def admin_settings():
+    admin_id = session.get('admin_id')
+    if not admin_id:
+        flash("Please log in as admin first", "warning")
+        return redirect(url_for('admin_login'))
+
+    admin = Administrator.query.get(admin_id)
+
+    if request.method == 'POST':
+        # Get form data
+        email = request.form.get('email')
+
+        # Check if email is being changed and already in use
+        if email != admin.email and Administrator.query.filter_by(email=email).first():
+            flash("Email already in use!", "danger")
+            return redirect(url_for('admin_settings'))
+
+        # Update admin email
+        admin.email = email
+
+        try:
+            db.session.commit()
+            flash("Admin email updated successfully!", "success")
+        except:
+            db.session.rollback()
+            flash("An error occurred while updating admin email.", "danger")
+
+    return render_template("admin_settings.html", admin=admin)
+
 if __name__ == '__main__':
     app.run(debug=True)

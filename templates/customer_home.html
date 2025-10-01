@@ -37,6 +37,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
+                        <div>Current Cash: $<span id="currentCash">{{ user.cash }}</span></div>
                         <form method="POST" action="{{ url_for('customer_home') }}">
                           <input type="hidden" name="action" value="buy">
                           <div class="mb-3">
@@ -126,16 +127,21 @@
                     <div class="border border-light rounded p-3 mb-3 d-flex flex-column align-items-center" style="height: 250px; background-color: rgba(128, 0, 128, 0.8);">
                       <h2 class="mt-2 mb-3">Current Value</h2>
                       <ul class="align-self-start fs-6">
-                        <li>NVDA: $32,583</li>
-                        <li>TSLA: $15,243</li>
+                        {% for entry in user.portfolio %}
+                          <li>
+                            {{ entry.stock.ticker_symbol }}: 
+                            {{ entry.quantity }} shares @ ${{ "%.2f"|format(entry.avg_purchase_price) }}
+                          </li>
+                        {% else %}
+                          <li>No stocks owned yet.</li>
+                        {% endfor %}
                       </ul>
                     </div>
                   </div>
                 </div>
                 <div class="portfolio-summary">
                     <h2>{{user.first_name}}'s Portfolio</h2>
-                    <div>Cash: $76.80</div>
-                    <div>Total Buying Power: $76.80</div>
+                    <div>Cash: ${{ "{:,.2f}".format(user.cash) }}</div>
                 </div>  
             </div>
         </div>
