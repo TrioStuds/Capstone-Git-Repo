@@ -24,29 +24,29 @@
 
                         <!-- Available Balance Display -->
                         <div class="text-center mb-4">
-                            <h5>Available Balance</h5>
+                            <h5>Cash Account Balance</h5>
                             <h3>${{ "%.2f"|format(user.cash|float) }}</h3>
                         </div>
 
                         {% if bank_accounts %}
                             <form method="POST" action="{{ url_for('withdraw') }}">
                                 <div class="mb-3">
-                                    <label for="bank_select" class="form-label">Select Bank Account</label>
+                                    <label for="amount" class="form-label">Amount to Withdraw from Cash account</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="amount" name="amount" 
+                                               step="0.01" min="0.01" max="{{ user.cash }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="bank_select" class="form-label">Select your Bank Account</label>
                                     <select class="form-select" id="bank_select" name="bank_id" required>
                                         <option value="">Choose bank account...</option>
                                         {% for bank in bank_accounts %}
                                             <option value="{{ bank.id }}">{{ bank.institute_name }}</option>
                                         {% endfor %}
                                     </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="amount" class="form-label">Amount to Withdraw</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="amount" name="amount" 
-                                               step="0.01" min="0.01" max="{{ user.cash }}" required>
-                                    </div>
                                 </div>
 
                                 <div class="d-grid gap-2">
