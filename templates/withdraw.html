@@ -2,13 +2,73 @@
 
 {% block title %}Withdraw{% endblock %}
 
-{% block page_header %}Withdraw{% endblock %}
+{% block page_header %}Withdraw Funds{% endblock %}
 
 {% block content %}
-<body class="text-white">
-    <div class="dashboard-container">
-        <div class="main-content">
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card bg-dark text-white">
+                <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
+                    <div class="card-body w-100">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <!-- Available Balance Display -->
+                        <div class="text-center mb-4">
+                            <h5>Available Balance</h5>
+                            <h3>${{ "%.2f"|format(user.cash|float) }}</h3>
+                        </div>
+
+                        {% if bank_accounts %}
+                            <form method="POST" action="{{ url_for('withdraw') }}">
+                                <div class="mb-3">
+                                    <label for="bank_select" class="form-label">Select Bank Account</label>
+                                    <select class="form-select" id="bank_select" name="bank_id" required>
+                                        <option value="">Choose bank account...</option>
+                                        {% for bank in bank_accounts %}
+                                            <option value="{{ bank.id }}">{{ bank.institute_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="amount" class="form-label">Amount to Withdraw</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="amount" name="amount" 
+                                               step="0.01" min="0.01" max="{{ user.cash }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
+                                        Withdraw Funds
+                                    </button>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">
+                                No bank accounts found. Please add a bank account in your settings first.
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('settings') }}" class="btn btn-primary" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
+                                    Add Bank Account
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}

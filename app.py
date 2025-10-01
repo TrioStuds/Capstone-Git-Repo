@@ -414,9 +414,56 @@ def deposit():
     # Render form with only this user's banks
     return render_template("deposit.html", user=user, bank_accounts=bank_accounts)
 
-@app.route('/withdraw')
+@app.route('/withdraw', methods=['GET', 'POST'])
 def withdraw():
-    return render_template('withdraw.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first", "warning")
+        return redirect(url_for('login'))
+    
+    user = User.query.get(user_id)
+    bank_accounts = BankInfo.query.filter_by(user_id=user.id).all()
+
+    if request.method == 'POST':
+        try:
+            amount = Decimal(request.form.get('amount', 0))
+            bank_id = request.form.get('bank_id')
+
+            bank_account = BankInfo.query.filter_by(id=bank_id, user_id=user.id).first()
+            if not bank_account:
+                flash("Invalid bank account selected.", "danger")
+                return redirect(url_for('withdraw'))
+            
+            if amount <= 0:
+                flash("Withdrawal amount must be positive.", "danger")
+                return redirect(url_for('withdraw'))
+            
+            if amount > user.cash:
+                flash("Insufficient funds in account.", "danger")
+                return redirect(url_for('withdraw'))
+
+            bank_account.funds += amount
+            user.cash -= amount
+
+            transaction = FinancialTransaction(
+                user_id=user.id,
+                amount=amount,
+                transaction_type="WITHDRAWAL",
+                related_order=None
+            )
+
+            db.session.add(transaction)
+            db.session.commit()
+
+            flash(f"Successfully withdrew ${amount} from your portfolio to your bank account, {bank_account.institute_name}", "success")
+            return redirect(url_for('customer_home'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error processing withdrawal: {str(e)}", "danger")
+            return redirect(url_for('withdraw'))
+        
+    return render_template('withdraw.html', user=user, bank_accounts=bank_accounts)
 
 @app.route('/transactions')
 def transactions():
