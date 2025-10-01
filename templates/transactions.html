@@ -37,21 +37,21 @@
                                                     <td>
                                                         <strong>{{ transaction.related_order.stock.ticker_symbol }}</strong>
                                                         {% if transaction.related_order.order_type == 'BUY' %}
-                                                            <span class="badge bg-success ms-2">BUY</span>
+                                                            <span class="badge bg-success ms-2">BUY</span> <!--buy/sell icon-->
                                                         {% else %}
                                                             <span class="badge bg-danger ms-2">SELL</span>
                                                         {% endif %}
                                                     </td>
-                                                    <td>{{ "%.2f"|format(transaction.related_order.quantity) }}</td>
-                                                    <td>${{ "%.2f"|format(transaction.related_order.price) }}</td>
+                                                    <td>{{ "%.2f"|format(transaction.related_order.quantity) }}</td> <!-- quantity-->
+                                                    <td>${{ "%.2f"|format(transaction.related_order.price) }}</td> <!-- price-->
                                                     <td>
-                                                        {% if transaction.related_order.order_type == 'BUY' %}
-                                                            <span class="text-danger">-${{ "%.2f"|format(transaction.related_order.total_cost) }}</span>
+                                                        {% if transaction.related_order.order_type == 'BUY' %} <!--if buy, red, if sell, green-->
+                                                            <span class="text-danger">${{ "%.2f"|format(transaction.related_order.total_cost) }}</span> 
                                                         {% else %}
-                                                            <span class="text-success">+${{ "%.2f"|format(transaction.related_order.total_cost) }}</span>
+                                                            <span class="text-success">${{ "%.2f"|format(transaction.related_order.total_cost) }}</span>
                                                         {% endif %}
                                                     </td>
-                                                    <td>{{ transaction.timestamp.strftime('%m/%d/%Y %I:%M %p') }}</td>
+                                                    <td>{{ transaction.timestamp.strftime('%m-%d-%Y %I:%M %p') }}</td>
                                                 </tr>
                                                 {% endif %}
                                                 {% endfor %}
