@@ -5,103 +5,88 @@
 {% block page_header %}Settings{% endblock %}
 
 {% block content %}
-<body class="text-white">
-    <div class="dashboard-container">
-        <div class="main-content text-center mt-4">
-            <!-- Settings Grid -->
-            <div class="container mt-4">
-                <div class="row justify-content-center">
-                    <!-- Personal Information Box -->
-                    <div class="col-md-12">
-                        <div class="card bg-dark text-white">
-                            <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
-                                <h2 class="mt-2 mb-4">Personal Information</h2>
-                                <div class="card-body w-100">
-                                    <!-- Alert Messages -->
-                                    {% with messages = get_flashed_messages(with_categories=true) %}
-                                        {% if messages %}
-                                            {% for category, message in messages %}
-                                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                                    {{ message }}
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endwith %}
-
-                                    <form method="POST" action="{{ url_for('settings') }}">
-                                        <input type="hidden" name="form_type" value="personal">
-                                        <div class="mb-3 row align-items-center">
-                                            <label class="col-sm-4 text-end">First Name:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" required>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3 row align-items-center">
-                                            <label class="col-sm-4 text-end">Last Name:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" required>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3 row align-items-center">
-                                            <label class="col-sm-4 text-end">Email:</label>
-                                            <div class="col-sm-8">
-                                                <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
-                                            </div>
-                                        </div>
-                                        <div class="text-center mt-4 mb-3">
-                                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
-                                                Save Changes
-                                            </button>
-                                        </div>
-                                    </form>
+<div class="container mt-4 text-white">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Personal Information Box -->
+            <div class="border border-light rounded d-flex flex-column align-items-center mb-4" 
+                 style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
+                <h2 class="mt-2 mb-4">Personal Information</h2>
+                <div class="card-body w-100">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form method="POST" action="{{ url_for('settings') }}">
+                        <input type="hidden" name="form_type" value="personal">
+                        <div class="mb-3 row align-items-center">
+                            <label class="col-sm-4 col-form-label text-end">First Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" required>
                             </div>
                         </div>
-                    </div>
-                    <!-- Add Bank Account Box -->
-                    <div class="col-md-12">
-                        <div class="card bg-dark text-white">
-                            <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
-                                <h2 class="mt-2 mb-4">Add Bank Account</h2>
-                                <div class="card-body w-100">
-                                    <form method="POST" action="{{ url_for('settings') }}">
-                                        <input type="hidden" name="form_type" value="bank">
-                                        
-                                        <div class="mb-3 row align-items-center">
-                                            <label class="col-sm-4 text-end">Bank Name:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" name="institute_name" required>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mb-3 row align-items-center">
-                                            <label class="col-sm-4 text-end">Routing Number:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" name="routing_number" required>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mb-3 row align-items-center">
-                                            <label class="col-sm-4 text-end">Account Number:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" name="account_number" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-center mt-4 mb-3">
-                                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
-                                                Add Bank Account
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
+                        <div class="mb-3 row align-items-center">
+                            <label class="col-sm-4 col-form-label text-end">Last Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" required>
                             </div>
                         </div>
-                    </div>
+                        <div class="mb-3 row align-items-center">
+                            <label class="col-sm-4 col-form-label text-end">Email:</label>
+                            <div class="col-sm-8">
+                                <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary" 
+                                    style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Add Bank Account Box -->
+            <div class="border border-light rounded d-flex flex-column align-items-center" 
+                 style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
+                <h2 class="mt-2 mb-4">Add Bank Account</h2>
+                <div class="card-body w-100">
+                    <form method="POST" action="{{ url_for('settings') }}">
+                        <input type="hidden" name="form_type" value="bank">
+                        <div class="mb-3 row align-items-center">
+                            <label class="col-sm-4 col-form-label text-end">Bank Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="institute_name" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row align-items-center">
+                            <label class="col-sm-4 col-form-label text-end">Routing Number:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="routing_number" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row align-items-center">
+                            <label class="col-sm-4 col-form-label text-end">Account Number:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="account_number" required>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary" 
+                                    style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
+                                Add Bank Account
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}

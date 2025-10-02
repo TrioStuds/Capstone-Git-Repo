@@ -2,39 +2,45 @@
 
 {% block title %}Deposit{% endblock %}
 
-{% block page_header %}Deposit{% endblock %}
+{% block page_header %}Deposit Funds{% endblock %}
 
 {% block content %}
-<body class="text-white">
-    <div class="dashboard-container">
-        <div class="main-content row justify-content-center">
-            <h1>Transfer Funds to Cash Account</h1>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"</button>
-                        </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-            <div class="col-md-6">
-                <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
+<div class="container mt-4 text-white">
+    <div class="row justify-content-center">
+        <h3>Transfer Funds to Cash Account</h3>
+        <div class="col-md-6">
+            <div class="text-white">
+                <div class="border border-light rounded d-flex flex-column align-items-center" 
+                     style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
                     <div class="card-body w-100">
-                        <form method="POST" action="{{url_for('deposit')}}">
-                            <div class="deposit-section">
-                                <div class="row mb-3">
-                                    <label for="inputAmount" class="col-sm-2 col-form-label">Amount</label>
-                                    <div class="col-sm-10">
-                                        <input type="number" step="0.01" min="0" class="form-control" id="inputAmount" name="amount" required>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <div class="text-center mb-4">
+                            <h5>Cash Account Balance</h5>
+                            <h3>${{ "%.2f"|format(user.cash|float) }}</h3>
+                        </div>
+                        {% if bank_accounts %}
+                            <form method="POST" action="{{ url_for('deposit') }}">
+                                <div class="mb-3">
+                                    <label for="inputAmount" class="form-label">Amount to Deposit</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" min="0.01" 
+                                               class="form-control" id="inputAmount" name="amount" required>
                                     </div>
                                 </div>
-                            <div class="row mb-3">
-                                <label for="inputFrom" class="col-sm-2 col-form-label">From</label>
-                                <div class="col-sm-10">
-                                    <select id="inputFrom" name="bank_id" class="form-select" aria-label="Select account" required>
-                                        <option value="" selected>Select Account</option>
+                                <div class="mb-3">
+                                    <label for="inputFrom" class="form-label">Select Bank Account</label>
+                                    <select id="inputFrom" name="bank_id" class="form-select" required>
+                                        <option value="" selected>Select Account...</option>
                                         {% for bank in bank_accounts %}
                                             <option value="{{ bank.id }}">
                                                 {{ bank.institute_name }} - {{ bank.account_number }} (Available: ${{ "%.2f"|format(bank.funds) }})
@@ -42,23 +48,28 @@
                                         {% endfor %}
                                     </select>     
                                 </div>
-                            </div>
-                            <!-- <div class="row mb-3">
-                                <label for="inputFreq" class="col-sm-2 col-form-label">Frequency</label>
-                                <div class="col-sm-10">
-                                    <select id="inputFreq" name="frequency" class="form-select" aria-label="Select frequency">
-                                        <option value="once" selected>Once</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly">Monthly</option>
-                                    </select>   
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary" 
+                                            style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
+                                        Deposit Funds
+                                    </button>
                                 </div>
-                            </div> -->
-                            <button type="submit" class="btn btn-light">Deposit</button>
-                        </form>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">
+                                No bank accounts found. Please add a bank account in your settings first.
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('settings') }}" class="btn btn-primary" 
+                                   style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
+                                    Add Bank Account
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}

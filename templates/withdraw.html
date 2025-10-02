@@ -2,13 +2,14 @@
 
 {% block title %}Withdraw{% endblock %}
 
-{% block page_header %}Withdraw Funds{% endblock %}
+{% block page_header %}Withdraw Cash{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 text-white">
     <div class="row justify-content-center">
+        <h3>Transfer Cash to Bank Account</h3>
         <div class="col-md-6">
-            <div class="card bg-dark text-white">
+            <div class="text-white">
                 <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
                     <div class="card-body w-100">
                         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,13 +22,11 @@
                                 {% endfor %}
                             {% endif %}
                         {% endwith %}
-
                         <!-- Available Balance Display -->
                         <div class="text-center mb-4">
                             <h5>Cash Account Balance</h5>
                             <h3>${{ "%.2f"|format(user.cash|float) }}</h3>
                         </div>
-
                         {% if bank_accounts %}
                             <form method="POST" action="{{ url_for('withdraw') }}">
                                 <div class="mb-3">
@@ -38,7 +37,6 @@
                                                step="0.01" min="0.01" max="{{ user.cash }}" required>
                                     </div>
                                 </div>
-
                                 <div class="mb-3">
                                     <label for="bank_select" class="form-label">Select your Bank Account</label>
                                     <select class="form-select" id="bank_select" name="bank_id" required>
@@ -48,7 +46,6 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">
                                         Withdraw Funds
