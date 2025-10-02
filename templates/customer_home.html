@@ -13,11 +13,12 @@
                 <div class="portfolio-chart">
                     <div class="circle-chart">Chart</div>
                     <div class="portfolio-actions">
+                        <!-- Bootstraps clean pop-up windows for trading -->
                         <button data-bs-toggle="modal" data-bs-target="#buyModal" class="btn btn-primary me-2" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">Buy</button>
                         <button data-bs-toggle="modal" data-bs-target="#sellModal" class="btn btn-primary me-2" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">Sell</button>
-                        <!-- <button data-bs-toggle="modal" data-bs-target="#editModal">Edit</button> -->
                     </div>
                 </div>
+                <!-- Alert messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                   {% if messages %}
                     {% for category, message in messages %}
@@ -28,7 +29,7 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
-                <!-- Buy pop-up window -->
+                <!-- Buy pop-up window modal -->
                 <div class="modal fade" id="buyModal" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
@@ -61,7 +62,7 @@
                     </div>
                   </div>
                 </div>
-                <!-- Sell pop-up window -->
+                <!-- Sell pop-up window modal -->
                 <div class="modal fade" id="sellModal" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
@@ -111,10 +112,9 @@
                   <canvas id="lineChart"></canvas>
                 </div>
             </div>
-                <!-- Bottom row: Upcoming Activity and Current Value side by side -->
+                <!-- Upcoming Activity  -->
                 <div class="row">
                   <div class="col-12 mb-4">
-                    <!-- Upcoming Activity box (left) -->
                     <div class="border border-light rounded p-3 mb-3 d-flex flex-column align-items-center" style="height: 250px; background-color: rgba(128, 0, 128, 0.8);">
                       <h2 class="mt-2 mb-3">Upcoming Activity</h2>
                       <div class="align-self-start fs-6">Trades</div>
@@ -122,10 +122,10 @@
                     </div>
                   </div>
                 </div>
-
+                <!-- Portfolio Summary -->
                 <div class="portfolio-summary">
                     <h2>{{user.first_name}}'s Portfolio</h2>
-                    <div class="card bg-dark text-white mb-4">
+                    <div class="text-white mb-4">
                         <div class="border border-light rounded p-3" style="background-color: rgba(128, 0, 128, 0.8);">
                             <div class="row">
                                 <div class="col-12 mb-3">
