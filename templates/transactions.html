@@ -42,7 +42,7 @@
                                                             <span class="badge bg-danger ms-2">SELL</span>
                                                         {% endif %}
                                                     </td>
-                                                    <td>{{ "%.2f"|format(transaction.related_order.quantity) }}</td> <!-- quantity-->
+                                                    <td>{{ "%.f"|format(transaction.related_order.quantity) }}</td> <!-- quantity-->
                                                     <td>${{ "%.2f"|format(transaction.related_order.price) }}</td> <!-- price-->
                                                     <td>
                                                         {% if transaction.related_order.order_type == 'BUY' %} <!--if buy, red, if sell, green-->
