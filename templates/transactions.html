@@ -18,18 +18,18 @@
                             <h2 class="mt-2 mb-4">Transactions</h2>
                             <div class="card-body w-100">
                                 <div class="table-responsive">
-                                    <table class="table table-hover" style="background: linear-gradient(90deg, #4B0B5C, #E0348E);">
+                                    <table class="table table-hover table-borderless">
                                         <thead>
                                             <tr>
-                                                <th scope="col">Stock</th>
-                                                <th scope="col">Ticker</th>
-                                                <th scope="col">Quantity</th>
-                                                <th scope="col">Price</th>
-                                                <th scope="col">Total</th>
-                                                <th scope="col">Date</th>
+                                                <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Stock</th>
+                                                <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Ticker</th>
+                                                <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Quantity</th>
+                                                <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Price</th>
+                                                <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Total</th>
+                                                <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Date</th>
                                                 </tr>
                                         </thead>
-                                            <tbody>
+                                            <tbody div class="opacity-1">
                                                 {% for transaction in transactions %}
                                                 {% if transaction.related_order %}
                                                 <tr>
