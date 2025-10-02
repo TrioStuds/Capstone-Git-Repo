@@ -12,7 +12,7 @@
             <div class="container mt-4">
                 <div class="row justify-content-center">
                     <!-- Transaction History Box -->
-
+                    <div class="col-md-12">
                     <div class="card bg-dark text-white">
                         <div class="border border-light rounded d-flex flex-column align-items-center" style="background-color: rgba(128, 0, 128, 0.8); padding: 20px;">
                             <h2 class="mt-2 mb-4">Transactions</h2>
@@ -28,7 +28,7 @@
                                                 <th scope="col">Total</th>
                                                 <th scope="col">Date</th>
                                                 </tr>
-                                            </thead>
+                                        </thead>
                                             <tbody>
                                                 {% for transaction in transactions %}
                                                 {% if transaction.related_order %}
@@ -60,7 +60,8 @@
                                 </div>
                             </div> 
                         </div>
-                    </div>        
+                    </div>   
+                    </div>     
                 </div>            
             </div>
         </div>
