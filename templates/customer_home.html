@@ -141,7 +141,65 @@
                 </div>
                 <div class="portfolio-summary">
                     <h2>{{user.first_name}}'s Portfolio</h2>
-                    <div>Cash: ${{ "{:,.2f}".format(user.cash) }}</div>
+                    <div class="card bg-dark text-white mb-4">
+                        <div class="border border-light rounded p-3" style="background-color: rgba(128, 0, 128, 0.8);">
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h5>Available Cash</h5>
+                                    <div class="h4">${{ "{:,.2f}".format(user.cash) }}</div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <h5>Stock Holdings</h5>
+                                    {% if user.portfolio %}
+                                        <div class="table-responsive">
+                                            <table class="table table-light table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Symbol</th>
+                                                        <th>Shares</th>
+                                                        <th>Avg. Cost</th>
+                                                        <th>Current Price</th>
+                                                        <th>Total Value</th>
+                                                        <th>Gain/Loss</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% set total_portfolio_value = namespace(value=0) %}
+                                                    {% for entry in user.portfolio %}
+                                                        {% set current_value = entry.quantity * entry.stock.price %}
+                                                        {% set purchase_value = entry.quantity * entry.avg_purchase_price %}
+                                                        {% set gain_loss = current_value - purchase_value %}
+                                                        {% set total_portfolio_value.value = total_portfolio_value.value + current_value %}
+                                                        <tr>
+                                                            <td>{{ entry.stock.ticker_symbol }}</td>
+                                                            <td>{{ entry.quantity }}</td>
+                                                            <td>${{ "{:,.2f}".format(entry.avg_purchase_price) }}</td>
+                                                            <td>${{ "{:,.2f}".format(entry.stock.price) }}</td>
+                                                            <td>${{ "{:,.2f}".format(current_value) }}</td>
+                                                            <td class="{{ 'text-success' if gain_loss > 0 else 'text-danger' if gain_loss < 0 else '' }}">
+                                                                {{ "+" if gain_loss > 0 else "" }}${{ "{:,.2f}".format(gain_loss) }}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                                <tfoot class="table-active">
+                                                    <tr>
+                                                        <td colspan="4"><strong>Total Portfolio Value</strong></td>
+                                                        <td colspan="2"><strong>${{ "{:,.2f}".format(total_portfolio_value.value + user.cash) }}</strong></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-muted">
+                                            No stocks in portfolio yet.
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>  
             </div>
         </div>
