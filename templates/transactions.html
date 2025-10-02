@@ -31,7 +31,7 @@
                                         </thead>
                                             <tbody div class="opacity-1">
                                                 {% for transaction in transactions %}
-                                                {% if transaction.related_order %}
+                                                {% if transaction.related_order %} <!-- checks to avoid errors if the transiton has no related order -->
                                                 <tr>
                                                     <td>{{ transaction.related_order.stock.company_name }}</td>
                                                     <td>
