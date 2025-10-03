@@ -6,6 +6,7 @@
 
 {% block content %}
 <body class="text-white">
+    <!-- Portfolio Overview Section -->
     <div class="dashboard-container">
         <div class="main-content">
             <p class="h2">Your Stock Portfolio</p>
@@ -13,12 +14,12 @@
                 <div class="portfolio-chart">
                     <div class="circle-chart">Chart</div>
                     <div class="portfolio-actions">
-                        <!-- Bootstraps clean pop-up windows for trading -->
+                        <!-- Bootstraps Buy/Sell Action buttons -->
                         <button data-bs-toggle="modal" data-bs-target="#buyModal" class="btn btn-primary me-2" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">Buy</button>
                         <button data-bs-toggle="modal" data-bs-target="#sellModal" class="btn btn-primary me-2" style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;">Sell</button>
                     </div>
                 </div>
-                <!-- Alert messages -->
+                <!-- Alert messages - Success/Error -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                   {% if messages %}
                     {% for category, message in messages %}
@@ -128,12 +129,14 @@
                     <div class="text-white mb-4">
                         <div class="border border-light rounded p-3" style="background-color: rgba(128, 0, 128, 0.8);">
                             <div class="row">
+                                <!-- Available Cash Display -->
                                 <div class="col-12 mb-3">
                                     <h5>Available Cash</h5>
                                     <div class="h4">${{ "{:,.2f}".format(user.cash) }}</div>
                                 </div>
                                 
                                 <div class="col-12">
+                                    <!-- Stock Holdings Table -->
                                     <h5>Stock Holdings</h5>
                                     {% if user.portfolio %}
                                         <div class="table-responsive">
