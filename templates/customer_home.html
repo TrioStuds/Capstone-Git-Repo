@@ -88,7 +88,6 @@
                     </div>
                   </div>
                 </div>
-            </div>
             <div class="info-section">  
                 <!-- Top row: Charts -->
                 <div class="row mb-4">
@@ -189,10 +188,9 @@
                 </div>  
             </div>
         </div>
-    </div>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const portfolioData = {{ portfolio_data | tojson | safe }};
+      const portfolioData = JSON.parse('{{ portfolio_data | tojson | safe }}' || '[]');
         const ctx = document.getElementById('portfolioPieChart');
         
         if (portfolioData && portfolioData.length > 0) {
