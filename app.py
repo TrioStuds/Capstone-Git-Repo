@@ -51,8 +51,7 @@ class StockMarket(db.Model):
     ticker_symbol = db.Column(db.String(4), unique=True, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     company_name = db.Column(db.String(150), nullable=False)
-    industry = db.Column(db.String(100))
-    country = db.Column(db.String(50), nullable=False)
+    volume = db.Column(db.Numeric(5), nullable=False)
 
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
@@ -202,14 +201,21 @@ def customer_home():
 
         if action == "buy":
             total_cost = stock.price * quantity
+            volume = stock.volume
             
             if total_cost > user.cash:
                 flash("Insufficient funds.", "danger")
                 return redirect(url_for('customer_home'))
             
+            if quantity > volume:
+                flash("Insufficient stock volume.", "danger")
+                return redirect(url_for('customer_home'))
+            
             else:
                 # Update portfolio
                 portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
+                stock.volume -= quantity
+
                 if portfolio_entry:
                     old_total_value = portfolio_entry.avg_purchase_price * portfolio_entry.quantity
                     new_total_value = old_total_value + total_cost
@@ -258,6 +264,8 @@ def customer_home():
 
             total_sale = stock.price * quantity
             portfolio_entry.quantity -= quantity
+            stock.volume += quantity
+
             if portfolio_entry.quantity <= 0:
                 db.session.delete(portfolio_entry)
 
@@ -321,21 +329,22 @@ def admin_home():
         company_name = request.form.get('company_name')
         ticker = request.form.get('ticker')
         price = request.form.get('price')
-        industry = request.form.get('industry')
-        country = request.form.get('country')
+        volume = request.form.get('volume')
 
-        new_stock = StockMarket(
+        try:
+            new_stock = StockMarket(
             company_name=company_name,
             ticker_symbol=ticker,
             price=price,
-            industry=industry,
-            country=country,
+            volume=volume,
         )
+            db.session.add(new_stock)
+            db.session.commit()
+            flash(f"Stock {ticker} created successfully!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An unexpected error occurred: Make sure stock is unique and input values are valid.", "danger")
 
-        db.session.add(new_stock)
-        db.session.commit()
-
-        flash(f"Stock {ticker} created successfully!", "success")
         return redirect(url_for('admin_home'))
 
     return render_template('admin_home.html')
