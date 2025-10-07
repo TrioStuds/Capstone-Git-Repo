@@ -289,11 +289,25 @@ def customer_home():
 
     stocks = StockMarket.query.all()
 
+    portfolio_data = []
+    for entry in portfolio:
+        try:
+            if float(entry.quantity) > 0:  # Only include stocks that user owns
+                current_value = float(entry.quantity * entry.stock.price)
+                portfolio_data.append({
+                    'symbol': entry.stock.ticker_symbol,
+                    'value': current_value
+                })
+        except (TypeError, ValueError) as e:
+            print(f"Error processing portfolio entry: {e}")
+            continue
+
     return render_template(
         'customer_home.html',
         user=user,
         stocks=stocks,
-        portfolio=portfolio
+        portfolio=portfolio,
+        portfolio_data=portfolio_data
     )
 
 @app.route('/admin_home', methods=['GET', 'POST'])
