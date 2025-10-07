@@ -106,80 +106,54 @@
                 </div>
                 <div class="card-body">
                     <!-- Current market hours display -->
-                    <div class="mb-3">
-                        <label class="form-label text-white">Current Market Hours</label>
-                        <!-- DATABASE: Pull current hours from market_settings table -->
-                        <input type="text" class="form-control" value="9:00 AM - 5:00 PM" readonly>
-                    </div>
-                    
-                    <!-- Market hours modification section -->
-                    <div class="mb-3">
-                        <label class="form-label text-white">Modify Market Hours</label>
-                        <div class="row">
-                            <!-- Opening time dropdowns -->
-                            <div class="col-md-3">
-                                <label class="form-label text-white small">Opening Hour</label>
-                                <div class="dropdown">
-                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        9:00
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">6:00</a></li>
-                                        <li><a class="dropdown-item" href="#">7:00</a></li>
-                                        <li><a class="dropdown-item" href="#">8:00</a></li>
-                                        <li><a class="dropdown-item" href="#">9:00</a></li>
-                                        <li><a class="dropdown-item" href="#">10:00</a></li>
-                                    </ul>
+                    <form method="POST" action="{{ url_for('update_market_hours') }}" id="marketHoursForm">
+                        <div class="mb-3">
+                            <label class="form-label text-white">Current Market Hours</label>
+                            <input type="text" class="form-control" value="{{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }}" readonly>
+                            <div class="row">
+                                <!-- Opening time dropdowns -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-white small">Opening Hour</label>
+                                    <select name="opening_hour" class="form-select" required>
+                                        <option value="6" {% if market_hours.opening_time.hour == 6 %}selected{% endif %}>6:00</option>
+                                        <option value="7" {% if market_hours.opening_time.hour == 7 %}selected{% endif %}>7:00</option>
+                                        <option value="8" {% if market_hours.opening_time.hour == 8 %}selected{% endif %}>8:00</option>
+                                        <option value="9" {% if market_hours.opening_time.hour == 9 %}selected{% endif %}>9:00</option>
+                                        <option value="10" {% if market_hours.opening_time.hour == 10 %}selected{% endif %}>10:00</option>
+                                    </select>
                                 </div>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label text-white small">AM/PM</label>
-                                <div class="dropdown">
-                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        AM
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">AM</a></li>
-                                        <li><a class="dropdown-item" href="#">PM</a></li>
-                                    </ul>
+                                
+                                <div class="col-md-3">
+                                    <label class="form-label text-white small">AM/PM</label>
+                                    <select name="opening_meridiem" class="form-select" required>
+                                        <option value="AM" selected>AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
                                 </div>
-                            </div>
-                            
-                            <!-- Closing time dropdowns -->
-                            <div class="col-md-3">
-                                <label class="form-label text-white small">Closing Hour</label>
-                                <div class="dropdown">
-                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        5:00
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">3:00</a></li>
-                                        <li><a class="dropdown-item" href="#">4:00</a></li>
-                                        <li><a class="dropdown-item" href="#">5:00</a></li>
-                                        <li><a class="dropdown-item" href="#">6:00</a></li>
-                                        <li><a class="dropdown-item" href="#">7:00</a></li>
-                                    </ul>
+                                
+                                <!-- Closing time dropdowns -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-white small">Closing Hour</label>
+                                    <select name="closing_hour" class="form-select" required>
+                                        <option value="3">3:00</option>
+                                        <option value="4">4:00</option>
+                                        <option value="5" selected>5:00</option>
+                                        <option value="6">6:00</option>
+                                        <option value="7">7:00</option>
+                                    </select>
                                 </div>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label text-white small">AM/PM</label>
-                                <div class="dropdown">
-                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        PM
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">AM</a></li>
-                                        <li><a class="dropdown-item" href="#">PM</a></li>
-                                    </ul>
+                                
+                                <div class="col-md-3">
+                                    <label class="form-label text-white small">AM/PM</label>
+                                    <select name="closing_meridiem" class="form-select" required>
+                                        <option value="AM">AM</option>
+                                        <option value="PM" selected>PM</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- DATABASE: Save new hours to market_settings table -->
-                    <button class="btn btn-success">Update Hours</button>
+                        <button type="submit" class="btn btn-success">Update Hours</button>
+                    </form>
                 </div>
             </div>
         </div>

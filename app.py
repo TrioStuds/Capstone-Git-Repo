@@ -119,12 +119,20 @@ class Administrator(db.Model):
     
 class MarketHours(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
-    open_time = db.Column(db.Time, nullable=False)
-    close_time = db.Column(db.Time, nullable=False)
+    opening_time = db.Column(db.Time, nullable=False, default=datetime.strptime('9:00 AM', '%I:%M %p').time())
+    closing_time = db.Column(db.Time, nullable=False, default=datetime.strptime('5:00 PM', '%I:%M %p').time())
+    is_active = db.Column(db.Boolean, default=True)
+
+    @staticmethod
+    def is_market_open():
+        current_time = datetime.now().time()
+        market_hours = MarketHours.query.first()
+        if market_hours and market_hours.is_active:
+            return market_hours.opening_time <= current_time <= market_hours.closing_time
+        return False
 
     def __repr__(self):
-        return f"<MarketHours {self.market.name} {self.open_time}-{self.close_time}>"
+        return f"<MarketHours {self.opening_time}-{self.closing_time} {'Active' if self.is_active else 'Inactive'}>"
 
 class MarketSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -147,6 +155,11 @@ with app.app_context():
             password=generate_password_hash("password")
         )
         db.session.add(admin_user)
+        db.session.commit()
+
+    if not MarketHours.query.first():
+        default_hours = MarketHours()
+        db.session.add(default_hours)
         db.session.commit()
 
 # Random Price Generator
@@ -302,12 +315,15 @@ def customer_home():
             print(f"Error processing portfolio entry: {e}")
             continue
 
+    market_hours = MarketHours.query.first()
+
     return render_template(
         'customer_home.html',
         user=user,
         stocks=stocks,
         portfolio=portfolio,
-        portfolio_data=portfolio_data
+        portfolio_data=portfolio_data,
+        market_hours=market_hours
     )
 
 @app.route('/admin_home', methods=['GET', 'POST'])
@@ -317,6 +333,8 @@ def admin_home():
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
     
+    market_hours = MarketHours.query.first()
+
     if request.method == 'POST':
         company_name = request.form.get('company_name')
         ticker = request.form.get('ticker')
@@ -338,7 +356,7 @@ def admin_home():
         flash(f"Stock {ticker} created successfully!", "success")
         return redirect(url_for('admin_home'))
 
-    return render_template('admin_home.html')
+    return render_template('admin_home.html', market_hours=market_hours)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -614,6 +632,39 @@ def admin_settings():
             flash("An error occurred while updating admin email.", "danger")
 
     return render_template("admin_settings.html", admin=admin)
+
+@app.route('/update_market_hours', methods=['POST'])
+def update_market_hours():
+    if not session.get('admin_id'):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('login'))
+
+    try:
+        opening_hour = request.form.get('opening_hour')
+        opening_meridiem = request.form.get('opening_meridiem')
+        closing_hour = request.form.get('closing_hour')
+        closing_meridiem = request.form.get('closing_meridiem')
+
+        # Convert to 24-hour format
+        opening_time = datetime.strptime(f"{opening_hour}:00 {opening_meridiem}", "%I:%M %p").time()
+        closing_time = datetime.strptime(f"{closing_hour}:00 {closing_meridiem}", "%I:%M %p").time()
+
+        # Update or create market hours
+        market_hours = MarketHours.query.first()
+        if not market_hours:
+            market_hours = MarketHours()
+
+        market_hours.opening_time = opening_time
+        market_hours.closing_time = closing_time
+        
+        db.session.add(market_hours)
+        db.session.commit()
+
+        flash("Market hours updated successfully!", "success")
+    except Exception as e:
+        flash(f"Error updating market hours: {str(e)}", "danger")
+
+    return redirect(url_for('admin_home'))
 
 @app.route('/logout')
 def logout():
