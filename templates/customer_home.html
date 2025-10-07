@@ -39,7 +39,7 @@
                             <label class="form-label">Stock Symbol</label>
                             <select name="stock_id" class="form-select" required>
                               {% for stock in stocks %}
-                                <option value="{{ stock.id }}">{{ stock.ticker_symbol }} - ${{ stock.price }}</option>
+                                <option value="{{ stock.id }}">{{ stock.ticker_symbol }} - ${{ stock.price }} - Volume: {{ stock.volume }}</option>
                               {% endfor %}
                             </select>
                           </div>
