@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from decimal import Decimal
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import random
 
 app = Flask(__name__)
@@ -52,7 +52,6 @@ class StockMarket(db.Model):
     company_name = db.Column(db.String(150), nullable=False)
     industry = db.Column(db.String(100))
     country = db.Column(db.String(50), nullable=False)
-    last_updated = db.Column(db.Date, nullable=False, default=date.today)
 
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
@@ -156,7 +155,6 @@ def update_stock_price():
         for stock in stocks:
             new_price = float(stock.price) * (1 + random.uniform(-0.01, 0.01))
             stock.price = max(new_price, 0)
-            stock.last_updated = date.today()
             print(f"Stock: {stock.ticker_symbol} updated to ${stock.price:.2f}")
         db.session.commit()
 
