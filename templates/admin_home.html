@@ -52,7 +52,7 @@
             </div>
 
          <!-- Right column : Market Schedule -->
-         <div class="col-md-6 mb-4">
+         <div class="col-md-5 mb-3">
             <div class="card" style="background-color: rgba(128, 0, 128, 0.8)">
                 <div class="card-header">
                     <h5 class="text-white mb-0">Set Market Schedule</h5>
@@ -60,33 +60,66 @@
                 <!-- Card body containing all form elements -->
                 <div class="card-body">
                     <!-- Current schedule display section -->
-                    <div class="mb-3">
-                        <label class="form-label text-white">Current Market Schedule</label>
-                        <input type="text" class="form-control" value="Monday - Friday" readonly>
-                    </div>
-                    <!-- Holiday exclusion dropdown section -->
-                    <div class="mb-3">
-                        <label class="form-label text-white">Exclude Dates</label>
-                        <div class="dropdown">
-                            <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                Select holidays to exclude
-                            </button>
-                            <ul class="dropdown-menu w-100">
-                                <li><a class="dropdown-item" href="#">New Year's Day (January 1)</a></li>
-                                <li><a class="dropdown-item" href="#">Martin Luther King Jr. Day (3rd Monday in January)</a></li>
-                                <li><a class="dropdown-item" href="#">Washington's Birthday / Presidents' Day (3rd Monday in February)</a></li>
-                                <li><a class="dropdown-item" href="#">Memorial Day (Last Monday in May)</a></li>
-                                <li><a class="dropdown-item" href="#">Juneteenth (June 19)</a></li>
-                                <li><a class="dropdown-item" href="#">Independence Day (July 4)</a></li>
-                                <li><a class="dropdown-item" href="#">Labor Day (1st Monday in September)</a></li>
-                                <li><a class="dropdown-item" href="#">Columbus Day (2nd Monday in October)</a></li>
-                                <li><a class="dropdown-item" href="#">Veterans Day (November 11)</a></li>
-                                <li><a class="dropdown-item" href="#">Thanksgiving Day (4th Thursday in November)</a></li>
-                                <li><a class="dropdown-item" href="#">Christmas Day (December 25)</a></li>
-                            </ul>
+                        <div class="card-body">
+                        <!-- Current market hours display -->
+                        <form class="Setting Market Days">
+                            <div class="mb-3">
+                                <label class="form-label text-white">Current Market Days</label>
+                                <input type="text" class="form-control" value="Set with Opening and Closing Day" readonly>
+                                <div class="row">
+                                    <!-- Opening time dropdowns -->
+                                    <div class="col-md-5">
+                                        <label class="form-label text-white small">Opening Day</label>
+                                        <select name="opening_hour" class="form-select" required>
+                                            <option value="Sunday">Sunday</option>
+                                            <option value="Monday">Monday</option>
+                                            <option value="Tuesday">Tuesday</option>
+                                            <option value="Wednesday">Wednesday</option>
+                                            <option value="Thursday">Thursday</option>
+                                            <option value="Friday">Friday</option>
+                                            <option value="Saturday">Saturday</option>
+                                        </select>
+                                    </div>
+                                    <!-- Closing day dropdown -->
+                                    <div class="col-md-5">
+                                        <label class="form-label text-white small">Closing Day</label>
+                                        <select name="closing_day" class="form-select" required>
+                                            <option value="Sunday">Sunday</option>
+                                            <option value="Monday">Monday</option>
+                                            <option value="Tuesday">Tuesday</option>
+                                            <option value="Wednesday">Wednesday</option>
+                                            <option value="Thursday">Thursday</option>
+                                            <option value="Friday">Friday</option>
+                                            <option value="Saturday">Saturday</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">Update Operating Days</button>
+                        </form>
+                        <div class="mb-3 mt-3">
+                            <label class="form-label text-white">Exclude Dates</label>
+                            <div class="dropdown">
+                                <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    Select holidays to exclude
+                                </button>
+                                <ul class="dropdown-menu w-100"><!-- Holiday exclusion dropdown section -->
+                                    <li><a class="dropdown-item" href="#">New Year's Day (January 1)</a></li>
+                                    <li><a class="dropdown-item" href="#">Martin Luther King Jr. Day (3rd Monday in January)</a></li>
+                                    <li><a class="dropdown-item" href="#">Washington's Birthday / Presidents' Day (3rd Monday in February)</a></li>
+                                    <li><a class="dropdown-item" href="#">Memorial Day (Last Monday in May)</a></li>
+                                    <li><a class="dropdown-item" href="#">Juneteenth (June 19)</a></li>
+                                    <li><a class="dropdown-item" href="#">Independence Day (July 4)</a></li>
+                                    <li><a class="dropdown-item" href="#">Labor Day (1st Monday in September)</a></li>
+                                    <li><a class="dropdown-item" href="#">Columbus Day (2nd Monday in October)</a></li>
+                                    <li><a class="dropdown-item" href="#">Veterans Day (November 11)</a></li>
+                                    <li><a class="dropdown-item" href="#">Thanksgiving Day (4th Thursday in November)</a></li>
+                                    <li><a class="dropdown-item" href="#">Christmas Day (December 25)</a></li>
+                                </ul>
+                            </div>
                         </div>
+                        <button class="btn btn-success">Confirm</button>
                     </div>
-                    <button class="btn btn-success">Confirm</button>
                 </div>
             </div>
          </div>
