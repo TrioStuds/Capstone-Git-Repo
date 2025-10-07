@@ -4,6 +4,7 @@ from flask_apscheduler import APScheduler
 from decimal import Decimal
 from datetime import datetime, timedelta
 import random
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -21,7 +22,7 @@ class User(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(1024), nullable=False)
     cash = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
     banks = db.relationship('BankInfo', backref='user', lazy=True)
@@ -111,7 +112,7 @@ class FinancialTransaction(db.Model):
 class Administrator(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(1024), nullable=False)
 
     def __repr__(self):
         return f"<Administrator {self.email}>"
@@ -143,7 +144,7 @@ with app.app_context():
     if not Administrator.query.filter_by(email="admin@email.com").first():
         admin_user = Administrator(
             email="admin@email.com",
-            password="password"
+            password=generate_password_hash("password")
         )
         db.session.add(admin_user)
         db.session.commit()
@@ -164,13 +165,13 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        user = User.query.filter_by(email=email, password=password).first()
-        admin = Administrator.query.filter_by(email=email, password=password).first()
+        user = User.query.filter_by(email=email).first()
+        admin = Administrator.query.filter_by(email=email).first()
 
-        if user:
+        if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             return redirect(url_for('customer_home'))
-        elif admin:
+        elif admin and check_password_hash(admin.password, password):
             session['admin_id'] = admin.id
             return redirect(url_for('admin_home'))
         else:
@@ -349,12 +350,14 @@ def register():
         if password != confirm_password:
             flash("Passwords do not match!", "danger")
             return redirect(url_for('register'))
+        
+        hashed_password = generate_password_hash(password)
 
         new_user = User(
             first_name=first_name,
             last_name=last_name,
             email=email,
-            password=password
+            password=hashed_password
         )
         db.session.add(new_user)
         db.session.commit()
