@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_apscheduler import APScheduler
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+import random
 
 app = Flask(__name__)
 
@@ -10,6 +12,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'vpn_secret_key'
 
 db = SQLAlchemy(app)
+
+scheduler = APScheduler()
+scheduler.init_app(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +52,7 @@ class StockMarket(db.Model):
     company_name = db.Column(db.String(150), nullable=False)
     industry = db.Column(db.String(100))
     country = db.Column(db.String(50), nullable=False)
+    last_updated = db.Column(db.Date, nullable=False, default=date.today)
 
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
@@ -141,6 +147,17 @@ with app.app_context():
             password="password"
         )
         db.session.add(admin_user)
+        db.session.commit()
+
+# Random Price Generator
+def update_stock_price():
+    with app.app_context():
+        stocks = StockMarket.query.all()
+        for stock in stocks:
+            new_price = float(stock.price) * (1 + random.uniform(-0.01, 0.01))
+            stock.price = max(new_price, 0)
+            stock.last_updated = date.today()
+            print(f"Stock: {stock.ticker_symbol} updated to ${stock.price:.2f}")
         db.session.commit()
 
 @app.route('/', methods=['GET', 'POST'])
@@ -589,6 +606,8 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for('login'))
 
+scheduler.start()
+scheduler.add_job(id="Update Stock Price", func=update_stock_price, trigger="interval", seconds=30)
 
 if __name__ == '__main__':
     app.run(debug=True)
