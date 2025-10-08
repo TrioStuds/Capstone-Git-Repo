@@ -120,12 +120,9 @@
                             <!-- Market hours and schedule -->
                             <div class="mt-3 text-center">
                                 <p class="text-white mb-1">
-                                    <strong>Market Hours:</strong><br>
-                                    {{ market_hours.opening_time.strftime('%I:%M %p') }} – {{ market_hours.closing_time.strftime('%I:%M %p') }}
+                                    <strong>Market Hours and Schedule:</strong><br>
+                                    {{ market_hours.opening_time.strftime('%I:%M %p') }} – {{ market_hours.closing_time.strftime('%I:%M %p') }} | {{ market_schedule.note }}
                                 </p>
-                                <small class="text-muted fst-italic">
-                                    Trading available {{ market_schedule.note }}
-                                </small>
                             </div>
                         </div>
                     </div>

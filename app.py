@@ -161,12 +161,16 @@ with app.app_context():
         db.session.commit()
 
     if not MarketSchedule.query.first():
-        db.session.add(MarketSchedule(start_day="Monday", end_day="Friday", note="Monday to Friday"))
+        db.session.add(MarketSchedule(start_day="Monday", end_day="Friday", note="Monday - Friday"))
         db.session.commit()
 
 # Random Price Generator
 def update_stock_price():
     with app.app_context():
+        if not is_market_open() or not MarketHours.query.first().is_market_open():
+            print("Market is closed. Skipping price update.")
+            return
+        
         stocks = StockMarket.query.all()
         for stock in stocks:
             new_price = float(stock.price) * (1 + random.uniform(-0.01, 0.01))
@@ -580,6 +584,8 @@ def settings():
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
             email = request.form.get('email')
+            new_password = request.form.get('password')
+            confirm_new_password = request.form.get('confirm_new_password')
 
             # Check if email is being changed and if it's already in use
             if email != user.email and User.query.filter_by(email=email).first():
@@ -590,6 +596,12 @@ def settings():
             user.first_name = first_name
             user.last_name = last_name
             user.email = email
+
+            if new_password:
+                if new_password != confirm_new_password:
+                    flash("Passwords do not match!", "danger")
+                    return redirect(url_for('settings'))
+                user.password = generate_password_hash(new_password)
 
             try:
                 db.session.commit()
@@ -651,6 +663,8 @@ def admin_settings():
     if request.method == 'POST':
         # Get form data
         email = request.form.get('email')
+        new_password = request.form.get('password')
+        confirm_new_password = request.form.get('confirm_new_password')
 
         # Check if email is being changed and already in use
         if email != admin.email and Administrator.query.filter_by(email=email).first():
@@ -660,9 +674,15 @@ def admin_settings():
         # Update admin email
         admin.email = email
 
+        if new_password:
+            if new_password != confirm_new_password:
+                flash("Passwords do not match!", "danger")
+                return redirect(url_for('settings'))
+            admin.password = generate_password_hash(new_password)
+
         try:
             db.session.commit()
-            flash("Admin email updated successfully!", "success")
+            flash("Admin information updated successfully!", "success")
         except:
             db.session.rollback()
             flash("An error occurred while updating admin email.", "danger")
@@ -718,7 +738,7 @@ def update_market_schedule():
 
         market_schedule.start_day = start_day
         market_schedule.end_day = end_day
-        market_schedule.note = f"{start_day} to {end_day}"
+        market_schedule.note = f"{start_day} - {end_day}"
 
         db.session.add(market_schedule)
         db.session.commit()
