@@ -18,7 +18,7 @@
         {% endif %}
     {% endwith %}
         <!-- Bootstrap row container -->
-         <div class="row">
+        <div class="row">
             <!-- Left column: Creating Stocks -->
              <div class="col-md-6 mb-4">
                 <div class="card" style="background-color: rgba(128, 0, 128, 0.8);">
@@ -51,80 +51,80 @@
                 </div>
             </div>
 
-         <!-- Market Schedule -->
-         <div class="col-md-5 mb-3">
-            <div class="card" style="background-color: rgba(128, 0, 128, 0.8)">
-                <div class="card-header">
-                    <h5 class="text-white mb-0">Set Market Schedule</h5>
-                </div>
-                <!-- Card body containing all form elements -->
-                <div class="card-body">
-                    <!-- Current schedule display section -->
+            <!-- Set Market Schedule -->
+            <!-- Set Market Schedule -->
+            <div class="col-md-5 mb-3">
+                <div class="card" style="background-color: rgba(128, 0, 128, 0.8)">
+                    <div class="card-header">
+                        <h5 class="text-white mb-0">Set Market Schedule</h5>
+                    </div>
+                    <!-- Card body containing all form elements -->
+                    <div class="card-body">
+                        <!-- Current schedule display section -->
                         <div class="card-body">
-                        <!-- Current market days display -->
-                        <form class="Setting Market Days">
-                            <div class="mb-3">
-                                <label class="form-label text-white">Current Market Days</label>
-                                <input type="text" class="form-control" value="Set with Opening and Closing Day" readonly>
-                                <div class="row">
-                                    <!-- Opening day dropdowns -->
-                                    <div class="col-md-5">
-                                        <label class="form-label text-white small">Opening Day</label>
-                                        <select name="opening_hour" class="form-select" required>
-                                            <option value="Sunday">Sunday</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
-                                            <option value="Saturday">Saturday</option>
-                                        </select>
-                                    </div>
-                                    <!-- Closing day dropdown -->
-                                    <div class="col-md-5">
-                                        <label class="form-label text-white small">Closing Day</label>
-                                        <select name="closing_day" class="form-select" required>
-                                            <option value="Sunday">Sunday</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
-                                            <option value="Saturday">Saturday</option>
-                                        </select>
+                            <!-- Current market days display -->
+                            <form method="POST" action="{{ url_for('update_market_schedule') }}">
+                                <div class="mb-3">
+                                    <label class="form-label text-white">Current Market Days</label>
+                                    <input type="text" class="form-control" 
+                                        value="{% if market_schedule and market_schedule.note %}{{ market_schedule.note }}{% else %}Monday - Friday{% endif %}" 
+                                        readonly>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-white small">Start Date</label>
+                                            <select name="start_date" class="form-select" required>
+                                                <option value="Sunday" {% if market_schedule.start_date == 'Sunday' %}selected{% endif %}>Sunday</option>
+                                                <option value="Monday" {% if market_schedule.start_date == 'Monday' %}selected{% endif %}>Monday</option>
+                                                <option value="Tuesday" {% if market_schedule.start_date == 'Tuesday' %}selected{% endif %}>Tuesday</option>
+                                                <option value="Wednesday" {% if market_schedule.start_date == 'Wednesday' %}selected{% endif %}>Wednesday</option>
+                                                <option value="Thursday" {% if market_schedule.start_date == 'Thursday' %}selected{% endif %}>Thursday</option>
+                                                <option value="Friday" {% if market_schedule.start_date == 'Friday' %}selected{% endif %}>Friday</option>
+                                                <option value="Saturday" {% if market_schedule.start_date == 'Saturday' %}selected{% endif %}>Saturday</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-white small">End Date</label>
+                                            <select name="end_date" class="form-select" required>
+                                                <option value="Sunday" {% if market_schedule.end_date == 'Sunday' %}selected{% endif %}>Sunday</option>
+                                                <option value="Monday" {% if market_schedule.end_date == 'Monday' %}selected{% endif %}>Monday</option>
+                                                <option value="Tuesday" {% if market_schedule.end_date == 'Tuesday' %}selected{% endif %}>Tuesday</option>
+                                                <option value="Wednesday" {% if market_schedule.end_date == 'Wednesday' %}selected{% endif %}>Wednesday</option>
+                                                <option value="Thursday" {% if market_schedule.end_date == 'Thursday' %}selected{% endif %}>Thursday</option>
+                                                <option value="Friday" {% if market_schedule.end_date == 'Friday' %}selected{% endif %}>Friday</option>
+                                                <option value="Saturday" {% if market_schedule.end_date == 'Saturday' %}selected{% endif %}>Saturday</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
+                                <button type="submit" class="btn btn-success">Update Operating Days</button>
+                            </form>
+                            <div class="mb-3 mt-3">
+                                <label class="form-label text-white">Exclude Dates</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                        Select holidays to exclude
+                                    </button>
+                                    <ul class="dropdown-menu w-100"><!-- Holiday exclusion dropdown section -->
+                                        <li><a class="dropdown-item" href="#">New Year's Day (January 1)</a></li>
+                                        <li><a class="dropdown-item" href="#">Martin Luther King Jr. Day (3rd Monday in January)</a></li>
+                                        <li><a class="dropdown-item" href="#">Washington's Birthday / Presidents' Day (3rd Monday in February)</a></li>
+                                        <li><a class="dropdown-item" href="#">Memorial Day (Last Monday in May)</a></li>
+                                        <li><a class="dropdown-item" href="#">Juneteenth (June 19)</a></li>
+                                        <li><a class="dropdown-item" href="#">Independence Day (July 4)</a></li>
+                                        <li><a class="dropdown-item" href="#">Labor Day (1st Monday in September)</a></li>
+                                        <li><a class="dropdown-item" href="#">Columbus Day (2nd Monday in October)</a></li>
+                                        <li><a class="dropdown-item" href="#">Veterans Day (November 11)</a></li>
+                                        <li><a class="dropdown-item" href="#">Thanksgiving Day (4th Thursday in November)</a></li>
+                                        <li><a class="dropdown-item" href="#">Christmas Day (December 25)</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-success">Update Operating Days</button>
-                        </form>
-                        <div class="mb-3 mt-3">
-                            <label class="form-label text-white">Exclude Dates</label>
-                            <div class="dropdown">
-                                <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select holidays to exclude
-                                </button>
-                                <ul class="dropdown-menu w-100"><!-- Holiday exclusion dropdown section -->
-                                    <li><a class="dropdown-item" href="#">New Year's Day (January 1)</a></li>
-                                    <li><a class="dropdown-item" href="#">Martin Luther King Jr. Day (3rd Monday in January)</a></li>
-                                    <li><a class="dropdown-item" href="#">Washington's Birthday / Presidents' Day (3rd Monday in February)</a></li>
-                                    <li><a class="dropdown-item" href="#">Memorial Day (Last Monday in May)</a></li>
-                                    <li><a class="dropdown-item" href="#">Juneteenth (June 19)</a></li>
-                                    <li><a class="dropdown-item" href="#">Independence Day (July 4)</a></li>
-                                    <li><a class="dropdown-item" href="#">Labor Day (1st Monday in September)</a></li>
-                                    <li><a class="dropdown-item" href="#">Columbus Day (2nd Monday in October)</a></li>
-                                    <li><a class="dropdown-item" href="#">Veterans Day (November 11)</a></li>
-                                    <li><a class="dropdown-item" href="#">Thanksgiving Day (4th Thursday in November)</a></li>
-                                    <li><a class="dropdown-item" href="#">Christmas Day (December 25)</a></li>
-                                </ul>
-                            </div>
+                            <button class="btn btn-success">Confirm</button>
                         </div>
-                        <button class="btn btn-success">Confirm</button>
                     </div>
                 </div>
-            </div>
-         </div>
-    </div>
-
+            </div><!-- End of Set Market Schedule Card --><!-- End of Set Market Schedule Card -->
+        </div>
     <!-- Bottom row: Market Hours Card -->
     <div class="row mt-4">
         <div class="col-md-12">
