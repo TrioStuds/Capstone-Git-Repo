@@ -135,9 +135,9 @@ class MarketHours(db.Model):
 
 class MarketSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=False)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date, nullable=False)
+    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=True)
+    start_date = db.Column(db.Date, nullable=False, default=lambda: (datetime.now() + timedelta((7 - datetime.now().weekday()) % 7)).date()) #defaults to monday
+    end_date = db.Column(db.Date, nullable=False, default=lambda: (datetime.now() + timedelta((7 - datetime.now().weekday()) % 7 + 4)).date()) #defaults to friyay
     is_holiday = db.Column(db.Boolean, default=False)
     note = db.Column(db.String(255))
 
@@ -342,6 +342,7 @@ def admin_home():
         return redirect(url_for('login'))
     
     market_hours = MarketHours.query.first()
+    market_schedule = MarketSchedule.query.first() #added for market schedule
 
     if request.method == 'POST':
         company_name = request.form.get('company_name')
@@ -365,7 +366,7 @@ def admin_home():
 
         return redirect(url_for('admin_home'))
 
-    return render_template('admin_home.html', market_hours=market_hours)
+    return render_template('admin_home.html', market_hours=market_hours, market_schedule=market_schedule) #added market_schedule
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -674,6 +675,39 @@ def update_market_hours():
         flash(f"Error updating market hours: {str(e)}", "danger")
 
     return redirect(url_for('admin_home'))
+
+@app.route('/update_market_schedule', methods=['POST'])
+def update_market_schedule():
+    if not session.get('admin_id'):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('login'))
+    
+    try:
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+
+        market_schedule = MarketSchedule.query.first()
+
+        if not market_schedule:
+            market_schedule = MarketSchedule(
+                market_id=None,  # or set to a default market if applicable
+                start_date=None,
+                end_date=None,
+                is_holiday=False
+            )
+        market_schedule.note = f"{start_date} to {end_date}"
+        # market_schedule.start_date = start_date
+        # market_schedule.end_date = end_date
+
+        db.session.add(market_schedule)
+        db.session.commit()
+
+        flash("Market schedule updated successfully!", "success")
+    except Exception as e:
+        flash(f"Error updating market schedule: {str(e)}", "danger")
+    
+    return redirect(url_for('admin_home'))
+
 
 @app.route('/logout')
 def logout():
