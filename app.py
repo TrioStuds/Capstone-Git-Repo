@@ -345,6 +345,7 @@ def customer_home():
             print(f"Error processing portfolio entry: {e}")
             continue
 
+    market_schedule = MarketSchedule.query.first()
     market_hours = MarketHours.query.first()
     market_open = is_market_open()
 
@@ -355,7 +356,8 @@ def customer_home():
         portfolio=portfolio,
         portfolio_data=portfolio_data,
         market_hours=market_hours,
-        market_open=market_open
+        market_open=market_open,
+        market_schedule=market_schedule
     )
 
 @app.route('/admin_home', methods=['GET', 'POST'])
