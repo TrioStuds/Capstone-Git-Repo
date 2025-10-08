@@ -4,7 +4,9 @@
 
 {% block page_header %}Customer Home{% endblock %}
 
-{% set market_open = market_hours.is_market_open() %}
+{% set market_open_hours = market_hours.is_market_open() %}
+
+{% set market_available = market_open and market_open_hours %}
 
 {% block content %}
 <body class="text-white">
@@ -105,13 +107,13 @@
                                 <button data-bs-toggle="modal" data-bs-target="#buyModal" 
                                         class="btn btn-primary me-2" 
                                         style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;"
-                                        {% if not market_open %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
+                                        {% if not market_available %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
                                     Buy
                                 </button>
                                 <button data-bs-toggle="modal" data-bs-target="#sellModal" 
                                         class="btn btn-primary me-2" 
                                         style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;"
-                                        {% if not market_open %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
+                                        {% if not market_available %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
                                     Sell
                                 </button>
                             </div>

@@ -135,9 +135,8 @@ class MarketHours(db.Model):
 
 class MarketSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    market_id = db.Column(db.Integer, db.ForeignKey('stock_market.id'), nullable=True)
-    start_date = db.Column(db.Date, nullable=False, default=lambda: (datetime.now() + timedelta((7 - datetime.now().weekday()) % 7)).date()) #defaults to monday
-    end_date = db.Column(db.Date, nullable=False, default=lambda: (datetime.now() + timedelta((7 - datetime.now().weekday()) % 7 + 4)).date()) #defaults to friyay
+    start_day = db.Column(db.String(10), nullable=False, default="Monday")
+    end_day = db.Column(db.String(10), nullable=False, default="Friday")
     is_holiday = db.Column(db.Boolean, default=False)
     note = db.Column(db.String(255))
 
@@ -161,6 +160,10 @@ with app.app_context():
         db.session.add(default_hours)
         db.session.commit()
 
+    if not MarketSchedule.query.first():
+        db.session.add(MarketSchedule(start_day="Monday", end_day="Friday", note="Monday to Friday"))
+        db.session.commit()
+
 # Random Price Generator
 def update_stock_price():
     with app.app_context():
@@ -170,6 +173,25 @@ def update_stock_price():
             stock.price = max(new_price, 0)
             print(f"Stock: {stock.ticker_symbol} updated to ${stock.price:.2f}")
         db.session.commit()
+
+def is_market_open():
+    market_schedule = MarketSchedule.query.first()
+    if not market_schedule or market_schedule.is_holiday:
+        return False
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    today = datetime.now().strftime("%A")
+
+    start_index = days.index(market_schedule.start_day)
+    end_index = days.index(market_schedule.end_day)
+    today_index = days.index(today)
+
+    if start_index <= end_index:
+        in_range = start_index <= today_index <= end_index
+    else:
+        in_range = today_index >= start_index or today_index <= end_index
+
+    return in_range
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -324,6 +346,7 @@ def customer_home():
             continue
 
     market_hours = MarketHours.query.first()
+    market_open = is_market_open()
 
     return render_template(
         'customer_home.html',
@@ -331,7 +354,8 @@ def customer_home():
         stocks=stocks,
         portfolio=portfolio,
         portfolio_data=portfolio_data,
-        market_hours=market_hours
+        market_hours=market_hours,
+        market_open=market_open
     )
 
 @app.route('/admin_home', methods=['GET', 'POST'])
@@ -681,23 +705,18 @@ def update_market_schedule():
     if not session.get('admin_id'):
         flash("Unauthorized access", "danger")
         return redirect(url_for('login'))
-    
+
     try:
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
+        start_day = request.form.get('start_date')
+        end_day = request.form.get('end_date')
 
         market_schedule = MarketSchedule.query.first()
-
         if not market_schedule:
-            market_schedule = MarketSchedule(
-                market_id=None,  # or set to a default market if applicable
-                start_date=None,
-                end_date=None,
-                is_holiday=False
-            )
-        market_schedule.note = f"{start_date} to {end_date}"
-        # market_schedule.start_date = start_date
-        # market_schedule.end_date = end_date
+            market_schedule = MarketSchedule()
+
+        market_schedule.start_day = start_day
+        market_schedule.end_day = end_day
+        market_schedule.note = f"{start_day} to {end_day}"
 
         db.session.add(market_schedule)
         db.session.commit()
@@ -705,9 +724,8 @@ def update_market_schedule():
         flash("Market schedule updated successfully!", "success")
     except Exception as e:
         flash(f"Error updating market schedule: {str(e)}", "danger")
-    
-    return redirect(url_for('admin_home'))
 
+    return redirect(url_for('admin_home'))
 
 @app.route('/logout')
 def logout():
