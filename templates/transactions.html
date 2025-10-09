@@ -27,36 +27,65 @@
                                                 <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Price</th>
                                                 <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Total</th>
                                                 <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Date</th>
-                                                </tr>
+                                            </tr>
                                         </thead>
-                                            <tbody div class="opacity-1">
-                                                {% for transaction in transactions %}
-                                                {% if transaction.related_order %} <!-- checks to avoid errors if the transiton has no related order -->
-                                                <tr>
-                                                    <td>{{ transaction.related_order.stock.company_name }}</td>
-                                                    <td>
-                                                        <strong>{{ transaction.related_order.stock.ticker_symbol }}</strong>
-                                                        {% if transaction.related_order.order_type == 'BUY' %}
-                                                            <span class="badge bg-success ms-2">BUY</span> <!--buy/sell icon-->
-                                                        {% else %}
-                                                            <span class="badge bg-danger ms-2">SELL</span>
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>{{ "%.f"|format(transaction.related_order.quantity) }}</td> <!-- quantity-->
-                                                    <td>${{ "%.2f"|format(transaction.related_order.price) }}</td> <!-- price-->
-                                                    <td>
-                                                        {% if transaction.related_order.order_type == 'BUY' %} <!--if buy, red, if sell, green-->
-                                                            <span class="text-danger">${{ "%.2f"|format(transaction.related_order.total_cost) }}</span> 
-                                                        {% else %}
-                                                            <span class="text-success">${{ "%.2f"|format(transaction.related_order.total_cost) }}</span>
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>{{ transaction.timestamp.strftime('%m-%d-%Y %I:%M %p') }}</td>
-                                                </tr>
-                                                {% endif %}
+                                        <tbody>
+                                            {% for transaction in transactions %}
+                                            {% if transaction.related_order %} 
+                                            <tr>
+                                                <td>{{ transaction.related_order.stock.company_name }}</td>
+                                                <td>
+                                                    <strong>{{ transaction.related_order.stock.ticker_symbol }}</strong>
+                                                    {% if transaction.related_order.order_type == 'BUY' %}
+                                                        <span class="badge bg-success ms-2">BUY</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger ms-2">SELL</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ "%.f"|format(transaction.related_order.quantity) }}</td>
+                                                <td>${{ "%.2f"|format(transaction.related_order.price) }}</td>
+                                                <td>
+                                                    {% if transaction.related_order.order_type == 'BUY' %}
+                                                        <span class="text-danger">${{ "%.2f"|format(transaction.related_order.total_cost) }}</span> 
+                                                    {% else %}
+                                                        <span class="text-success">${{ "%.2f"|format(transaction.related_order.total_cost) }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ transaction.timestamp.strftime('%m-%d-%Y %I:%M %p') }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+
+                                    <!-- pagination controls -->
+                                    {% if pagination and (pagination.pages > 1) %}
+                                    <div class="d-flex flex-column align-items-center mt-3">
+                                        <div class="mb-2 text-white small">
+                                            {{ (pagination.page - 1) * pagination.per_page + 1 }} -
+                                            {{ (pagination.page - 1) * pagination.per_page + transactions|length }}
+                                            of {{ pagination.total }}
+                                        </div>
+                                       
+                                        <nav aria-label="Transactions pagination">
+                                            <ul class="pagination pagination-sm mb-0 custom-pagination">
+                                                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                                    <a class="page-link" href="{{ url_for('transactions', page=pagination.prev_num) }}" aria-label="Previous">&#x276E;</a>
+                                                </li>
+
+                                                {% for p in range(1, pagination.pages + 1) %}
+                                                    <li class="page-item {% if p == pagination.page %}active{% endif %}" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
+                                                        <a class="page-link" href="{{ url_for('transactions', page=p) }}">{{ p }}</a>
+                                                    </li>
                                                 {% endfor %}
-                                            </tbody>
-                                    </table>  
+
+                                                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                                    <a class="page-link" href="{{ url_for('transactions', page=pagination.next_num) }}" aria-label="Next">&#x276F;</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                    {% endif %}
                                 </div>
                             </div> 
                         </div>
