@@ -562,6 +562,18 @@ def withdraw():
         
     return render_template('withdraw.html', user=user, bank_accounts=bank_accounts)
 
+# @app.route('/transactions')
+# def transactions():
+#     user_id = session.get('user_id')
+#     if not user_id:
+#         flash("Please log in first", "warning")
+#         return redirect(url_for('login'))
+    
+#     user = User.query.get(user_id)
+#     transactions = FinancialTransaction.query.filter_by(user_id=user.id).order_by(FinancialTransaction.timestamp.desc()).all()
+#     return render_template('transactions.html', user=user, transactions=transactions)
+#     #return render_template('transactions.html')
+
 @app.route('/transactions')
 def transactions():
     user_id = session.get('user_id')
@@ -570,9 +582,17 @@ def transactions():
         return redirect(url_for('login'))
     
     user = User.query.get(user_id)
-    transactions = FinancialTransaction.query.filter_by(user_id=user.id).order_by(FinancialTransaction.timestamp.desc()).all()
-    return render_template('transactions.html', user=user, transactions=transactions)
-    #return render_template('transactions.html')
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    pagination = FinancialTransaction.query.filter_by(user_id=user.id) \
+        .order_by(FinancialTransaction.timestamp.desc()) \
+        .paginate(page=page, per_page=per_page, error_out=False)
+
+    transactions = pagination.items
+
+    return render_template('transactions.html', user=user, transactions=transactions, pagination=pagination)
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
