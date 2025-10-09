@@ -381,6 +381,7 @@ def admin_home():
     market_hours = MarketHours.query.first()
     market_schedule = MarketSchedule.query.first() #added for market schedule
 
+    # Handling stock creation
     if request.method == 'POST':
         company_name = request.form.get('company_name')
         ticker = request.form.get('ticker')
@@ -561,18 +562,6 @@ def withdraw():
             return redirect(url_for('withdraw'))
         
     return render_template('withdraw.html', user=user, bank_accounts=bank_accounts)
-
-# @app.route('/transactions')
-# def transactions():
-#     user_id = session.get('user_id')
-#     if not user_id:
-#         flash("Please log in first", "warning")
-#         return redirect(url_for('login'))
-    
-#     user = User.query.get(user_id)
-#     transactions = FinancialTransaction.query.filter_by(user_id=user.id).order_by(FinancialTransaction.timestamp.desc()).all()
-#     return render_template('transactions.html', user=user, transactions=transactions)
-#     #return render_template('transactions.html')
 
 @app.route('/transactions')
 def transactions():
@@ -755,18 +744,22 @@ def update_market_schedule():
         flash("Unauthorized access", "danger")
         return redirect(url_for('login'))
 
+    # Retreive the start and end days from the form
     try:
         start_day = request.form.get('start_date')
         end_day = request.form.get('end_date')
 
+        # Fetching the existing market schedule configuration
         market_schedule = MarketSchedule.query.first()
         if not market_schedule:
             market_schedule = MarketSchedule()
 
+        # Updating the market schedule with new values
         market_schedule.start_day = start_day
         market_schedule.end_day = end_day
         market_schedule.note = f"{start_day} - {end_day}"
 
+        # Saving the changes to the database
         db.session.add(market_schedule)
         db.session.commit()
 
