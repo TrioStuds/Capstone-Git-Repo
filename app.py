@@ -122,14 +122,6 @@ class MarketHours(db.Model):
     closing_time = db.Column(db.Time, nullable=False, default=datetime.strptime('5:00 PM', '%I:%M %p').time())
     is_active = db.Column(db.Boolean, default=True)
 
-    @staticmethod
-    def is_market_open():
-        current_time = datetime.now().time()
-        market_hours = MarketHours.query.first()
-        if market_hours and market_hours.is_active:
-            return market_hours.opening_time <= current_time <= market_hours.closing_time
-        return False
-
     def __repr__(self):
         return f"<MarketHours {self.opening_time}-{self.closing_time} {'Active' if self.is_active else 'Inactive'}>"
 
@@ -167,7 +159,7 @@ with app.app_context():
 # Random Price Generator
 def update_stock_price():
     with app.app_context():
-        if not is_market_open() or not MarketHours.query.first().is_market_open():
+        if not is_market_open():
             print("Market is closed. Skipping price update.")
             return
         
@@ -180,22 +172,37 @@ def update_stock_price():
 
 def is_market_open():
     market_schedule = MarketSchedule.query.first()
+    market_hours = MarketHours.query.first()
+    current_time = datetime.now().time()
+    today = datetime.now().strftime("%A")
+
     if not market_schedule or market_schedule.is_holiday:
         return False
 
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    today = datetime.now().strftime("%A")
-
     start_index = days.index(market_schedule.start_day)
     end_index = days.index(market_schedule.end_day)
     today_index = days.index(today)
 
     if start_index <= end_index:
-        in_range = start_index <= today_index <= end_index
+        in_day_range = start_index <= today_index <= end_index
     else:
-        in_range = today_index >= start_index or today_index <= end_index
+        in_day_range = today_index >= start_index or today_index <= end_index
 
-    return in_range
+    # handles overnight sessions (example: 7 PM - 3 AM)
+    if market_hours and market_hours.is_active:
+        open_t = market_hours.opening_time
+        close_t = market_hours.closing_time
+
+        if open_t < close_t:
+            in_time_range = open_t <= current_time <= close_t
+        else:
+            # Overnight case (spans midnight)
+            in_time_range = current_time >= open_t or current_time <= close_t
+    else:
+        in_time_range = False
+
+    return in_day_range and in_time_range
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
