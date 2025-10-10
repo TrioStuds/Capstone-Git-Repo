@@ -139,14 +139,6 @@ class MarketSchedule(db.Model):
 with app.app_context():
     db.create_all()
 
-    if not Administrator.query.filter_by(email="admin@email.com").first():
-        admin_user = Administrator(
-            email="admin@email.com",
-            password=generate_password_hash("password")
-        )
-        db.session.add(admin_user)
-        db.session.commit()
-
     if not MarketHours.query.first():
         default_hours = MarketHours()
         db.session.add(default_hours)
@@ -203,6 +195,16 @@ def is_market_open():
         in_time_range = False
 
     return in_day_range and in_time_range
+
+from flask import request
+
+@app.before_request
+def check_admin_exists():
+    # Allow access to setup route if admin doesn't exist yet
+    allowed_routes = ['setup_admin']
+    
+    if Administrator.query.count() == 0 and request.endpoint not in allowed_routes:
+        return redirect(url_for('setup_admin'))
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -459,6 +461,46 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
+
+@app.route('/setup_admin', methods=['GET', 'POST'])
+def setup_admin():
+    # If admin already exists, prevent setup
+    if Administrator.query.count() > 0:
+        flash("Admin account already exists!", "warning")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        session.clear()
+
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        existing_admin = Administrator.query.filter_by(email=email).first()
+        existing_user = User.query.filter_by(email=email).first()
+
+        if existing_admin or existing_user:
+            flash("Email is already registered!", "danger")
+            return redirect(url_for('setup_admin'))
+        
+        if password != confirm_password:
+            flash("Passwords do not match!", "danger")
+            return redirect(url_for('setup_admin'))
+
+        hashed_password = generate_password_hash(password)
+
+        new_admin = Administrator(
+            email=email,
+            password=hashed_password
+        )
+
+        db.session.add(new_admin)
+        db.session.commit()
+
+        flash("Admin account created successfully!", "success")
+        return redirect(url_for('login'))
+
+    return render_template('setup_admin.html')
 
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
