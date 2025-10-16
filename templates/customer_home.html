@@ -88,181 +88,239 @@
                     </div>
                   </div>
                 </div>
-            <div class="info-section">  
-                <!-- Top row: Charts -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <!-- Pie Chart -->
-                        <div style="background: transparent;">
-                            <h5 class="text-white mb-3">Portfolio</h5>
-                            <div style="width: 250px; height: 250px; margin: 0 auto;">  
-                                <canvas id="portfolioPieChart"></canvas>
-                            </div>
-                            <!-- Buy/Sell buttons under chart -->
-                            <div class="mt-3">
-                                <button data-bs-toggle="modal" data-bs-target="#buyModal" 
-                                        class="btn btn-primary me-2" 
-                                        style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;"
-                                        {% if not market_open %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
-                                    Buy
-                                </button>
-                                <button data-bs-toggle="modal" data-bs-target="#sellModal" 
-                                        class="btn btn-primary me-2" 
-                                        style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;"
-                                        {% if not market_open %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
-                                    Sell
-                                </button>
-                            </div>
-                            <!-- Market hours and schedule -->
-                            <div class="mt-3 text-center">
-                                <p class="text-white mb-1">
-                                    <strong>Market Hours and Schedule:</strong><br>
-                                    {{ market_hours.opening_time.strftime('%I:%M %p') }} – {{ market_hours.closing_time.strftime('%I:%M %p') }} | {{ market_schedule.note }}
-                                </p>
-                            </div>
+            <div class="row mb-4">
+                <!-- Pie Chart -->
+                <div class="col-md-6 order-md-2">
+                    <div style="background: transparent;">
+                        <h5 class="text-white mb-3">Portfolio</h5>
+                        <div style="width: 250px; height: 250px; margin: 0 auto;">  
+                            <canvas id="portfolioPieChart"></canvas>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <!-- Line Graph -->
-                        <canvas id="lineChart"></canvas>
+                        <!-- Buy/Sell buttons under chart -->
+                        <div class="mt-3">
+                            <button data-bs-toggle="modal" data-bs-target="#buyModal" 
+                                    class="btn btn-primary me-2" 
+                                    style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;"
+                                    {% if not market_open %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
+                                Buy
+                            </button>
+                            <button data-bs-toggle="modal" data-bs-target="#sellModal" 
+                                    class="btn btn-primary me-2" 
+                                    style="background: linear-gradient(90deg, #4B0B5C, #E0348E); border: none;"
+                                    {% if not market_open %}disabled title="Trading is only available during market hours ({{ market_hours.opening_time.strftime('%I:%M %p') }} - {{ market_hours.closing_time.strftime('%I:%M %p') }})"{% endif %}>
+                                Sell
+                            </button>
+                        </div>
+                        <!-- Market hours and schedule -->
+                        <div class="mt-3 text-center">
+                            <p class="text-white mb-1">
+                                <strong>Market Hours and Schedule:</strong><br>
+                                {{ market_hours.opening_time.strftime('%I:%M %p') }} – {{ market_hours.closing_time.strftime('%I:%M %p') }} | {{ market_schedule.note }}
+                            </p>
+                        </div>
                     </div>
                 </div>
+                <!-- Current Stocks Available -->
+                <div class="col-md-6 order-md-1">
+                    <h5 class="text-white mb-3">Stocks Available for Purchase</h5>
+                    <div class="border border-light rounded p-3" style="background-color: rgba(128, 0, 128, 0.8);"
+                        <div class="table-responsive">
+                            <table class="table table-light table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Symbol</th>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Company</th>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Price</th>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Volume</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stock in paginated_stocks %}
+                                    <tr>
+                                        <td>{{ stock.ticker_symbol }}</td>
+                                        <td>{{ stock.company_name }}</td>
+                                        <td>${{ "{:,.2f}".format(stock.price) }}</td>
+                                        <td>{{ stock.volume }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination controls -->
+                        <nav aria-label="Stocks Pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if stocks_pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('customer_home', page=stocks_pagination.prev_num) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                                </li>
+                                {% endif %}
+
+                                {% for page_num in stocks_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                <li class="page-item {% if page_num == stocks_pagination.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('customer_home', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if stocks_pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('customer_home', page=stocks_pagination.next_num) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                </div>
             </div>
-                <!-- Portfolio Summary -->
-                <div class="portfolio-summary">
-                    <h2>{{user.first_name}}'s Portfolio</h2>
-                    <div class="text-white mb-4">
-                        <div class="border border-light rounded p-3" style="background-color: rgba(128, 0, 128, 0.8);">
-                            <div class="row">
-                                <!-- Available Cash Display -->
-                                <div class="col-12 mb-3">
-                                    <h5>Available Cash</h5>
-                                    <div class="h4">${{ "{:,.2f}".format(user.cash) }}</div>
-                                </div>
-                                
-                                <div class="col-12">
-                                    <!-- Stock Holdings Table -->
-                                    <h5>Stock Holdings</h5>
-                                    {% if user.portfolio %}
-                                        <div class="table-responsive">
-                                            <table class="table table-light table-hover">
-                                                <thead>
+            <!-- Portfolio Summary -->
+            <div class="portfolio-summary">
+                <h2>{{user.first_name}}'s Portfolio</h2>
+                <div class="text-white mb-4">
+                    <div class="border border-light rounded p-3" style="background-color: rgba(128, 0, 128, 0.8);">
+                        <div class="row">
+                            <!-- Available Cash Display -->
+                            <div class="col-12 mb-3">
+                                <h5>Available Cash</h5>
+                                <div class="h4">${{ "{:,.2f}".format(user.cash) }}</div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <!-- Stock Holdings Table -->
+                                <h5>Stock Holdings</h5>
+                                {% if user.portfolio %}
+                                    <div class="table-responsive">
+                                        <table class="table table-light table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Symbol</th>
+                                                    <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Shares</th>
+                                                    <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Avg. Cost</th>
+                                                    <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Current Price</th>
+                                                    <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Total Value</th>
+                                                    <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Gain/Loss</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% set total_portfolio_value = namespace(value=0) %}
+                                                {% for entry in user.portfolio %}
+                                                    {% set current_value = entry.quantity * entry.stock.price %}
+                                                    {% set purchase_value = entry.quantity * entry.avg_purchase_price %}
+                                                    {% set gain_loss = current_value - purchase_value %}
+                                                    {% set total_portfolio_value.value = total_portfolio_value.value + current_value %}
                                                     <tr>
-                                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Symbol</th>
-                                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Shares</th>
-                                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Avg. Cost</th>
-                                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Current Price</th>
-                                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Total Value</th>
-                                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Gain/Loss</th>
+                                                        <td>{{ entry.stock.ticker_symbol }}</td>
+                                                        <td>{{ entry.quantity }}</td>
+                                                        <td>${{ "{:,.2f}".format(entry.avg_purchase_price) }}</td>
+                                                        <td>${{ "{:,.2f}".format(entry.stock.price) }}</td>
+                                                        <td>${{ "{:,.2f}".format(current_value) }}</td>
+                                                        <td class="{{ 'text-success' if gain_loss > 0 else 'text-danger' if gain_loss < 0 else '' }}">
+                                                            {{ "+" if gain_loss > 0 else "" }}${{ "{:,.2f}".format(gain_loss) }}
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% set total_portfolio_value = namespace(value=0) %}
-                                                    {% for entry in user.portfolio %}
-                                                        {% set current_value = entry.quantity * entry.stock.price %}
-                                                        {% set purchase_value = entry.quantity * entry.avg_purchase_price %}
-                                                        {% set gain_loss = current_value - purchase_value %}
-                                                        {% set total_portfolio_value.value = total_portfolio_value.value + current_value %}
-                                                        <tr>
-                                                            <td>{{ entry.stock.ticker_symbol }}</td>
-                                                            <td>{{ entry.quantity }}</td>
-                                                            <td>${{ "{:,.2f}".format(entry.avg_purchase_price) }}</td>
-                                                            <td>${{ "{:,.2f}".format(entry.stock.price) }}</td>
-                                                            <td>${{ "{:,.2f}".format(current_value) }}</td>
-                                                            <td class="{{ 'text-success' if gain_loss > 0 else 'text-danger' if gain_loss < 0 else '' }}">
-                                                                {{ "+" if gain_loss > 0 else "" }}${{ "{:,.2f}".format(gain_loss) }}
-                                                            </td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                                <tfoot class="table-active">
-                                                    <tr>
-                                                        <td colspan="4"><strong>Total Portfolio Value</strong></td>
-                                                        <td colspan="2"><strong>${{ "{:,.2f}".format(total_portfolio_value.value + user.cash) }}</strong></td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    {% else %}
-                                        <div class="text-muted">
-                                            No stocks in portfolio yet.
-                                        </div>
-                                    {% endif %}
-                                </div>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot class="table-active">
+                                                <tr>
+                                                    <td colspan="4"><strong>Total Portfolio Value</strong></td>
+                                                    <td colspan="2"><strong>${{ "{:,.2f}".format(total_portfolio_value.value + user.cash) }}</strong></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="text-muted">
+                                        No stocks in portfolio yet.
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                </div>  
-            </div>
+                </div>
+            </div>  
         </div>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const portfolioData = JSON.parse('{{ portfolio_data | tojson | safe }}' || '[]');
-        const ctx = document.getElementById('portfolioPieChart');
-        
-        if (portfolioData && portfolioData.length > 0) {
-        new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: portfolioData.map(item => item.symbol),
-                    datasets: [{
-                        data: portfolioData.map(item => item.value),
-                        backgroundColor: [
-                            '#FF6384',
-                            '#36A2EB',
-                            '#FFCE56',
-                            '#4BC0C0',
-                            '#9966FF',
-                            '#FF9F40'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                              color: 'white',
-                              padding: 10
-                            }
-                        },
-                        title: {
-                            display: false,
-                            text: 'Holdings'
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const portfolioData = JSON.parse('{{ portfolio_data | tojson | safe }}' || '[]');
+    const ctx = document.getElementById('portfolioPieChart');
+    
+    if (portfolioData && portfolioData.length > 0) {
+    new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: portfolioData.map(item => item.symbol),
+                datasets: [{
+                    data: portfolioData.map(item => item.value),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                          color: 'white',
+                          padding: 10
                         }
+                    },
+                    title: {
+                        display: false,
+                        text: 'Holdings'
                     }
                 }
-            });
-        } else {
-            ctx.style.display = 'none';  // Hide canvas if no data
-            const noDataMsg = document.createElement('p');
-            noDataMsg.textContent = 'Please buy some stocks to see your portfolio distribution';
-            noDataMsg.className = 'text-white text-center mt-3';
-            ctx.parentNode.appendChild(noDataMsg);
-        }
-    });
-    </script>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tradingButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-        
-        tradingButtons.forEach(button => {
-            if (button.disabled) {
-                const tooltip = new bootstrap.Tooltip(button);
-                
-                button.addEventListener('mouseover', function() {
-                    tooltip.show();
-                });
-                
-                button.addEventListener('mouseout', function() {
-                    tooltip.hide();
-                });
             }
         });
+    } else {
+        ctx.style.display = 'none';  // Hide canvas if no data
+        const noDataMsg = document.createElement('p');
+        noDataMsg.textContent = 'Please buy some stocks to see your portfolio distribution';
+        noDataMsg.className = 'text-white text-center mt-3';
+        ctx.parentNode.appendChild(noDataMsg);
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tradingButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+    
+    tradingButtons.forEach(button => {
+        if (button.disabled) {
+            const tooltip = new bootstrap.Tooltip(button);
+            
+            button.addEventListener('mouseover', function() {
+                tooltip.show();
+            });
+            
+            button.addEventListener('mouseout', function() {
+                tooltip.hide();
+            });
+        }
     });
-    </script>
+});
+</script>
 </body>
 {% endblock %}

@@ -345,6 +345,12 @@ def customer_home():
 
     stocks = StockMarket.query.all()
 
+    # Pagination logic for stocks
+    page = request.args.get('page', 1, type=int)  # Get the current page number from the query string
+    per_page = 7  # Number of stocks per page
+    stocks_pagination = StockMarket.query.paginate(page=page, per_page=per_page, error_out=False)
+    paginated_stocks = stocks_pagination.items  # Get the stocks for the current page
+
     portfolio_data = []
     for entry in portfolio:
         try:
@@ -366,11 +372,13 @@ def customer_home():
         'customer_home.html',
         user=user,
         stocks=stocks,
+        stocks_pagination=stocks_pagination,
         portfolio=portfolio,
         portfolio_data=portfolio_data,
         market_hours=market_hours,
         market_open=market_open,
-        market_schedule=market_schedule
+        market_schedule=market_schedule,
+        paginated_stocks=paginated_stocks
     )
 
 @app.route('/admin_home', methods=['GET', 'POST'])
