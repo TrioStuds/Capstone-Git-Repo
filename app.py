@@ -52,6 +52,7 @@ class StockMarket(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     company_name = db.Column(db.String(150), nullable=False)
     volume = db.Column(db.Numeric(5), nullable=False)
+    trend = db.Column(db.String(10), nullable=True)
 
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
@@ -148,18 +149,35 @@ with app.app_context():
         db.session.add(MarketSchedule(start_day="Monday", end_day="Friday", note="Monday - Friday"))
         db.session.commit()
 
+def assign_daily_trends():
+    with app.app_context():
+        stocks = StockMarket.query.all()
+        for stock in stocks:
+            stock.trend = random.choice(["bullish", "bearish"])
+            print(f"{stock.ticker_symbol} is {stock.trend} today.")
+        db.session.commit()
+
 # Random Price Generator
 def update_stock_price():
     with app.app_context():
         if not is_market_open():
             print("Market is closed. Skipping price update.")
             return
-        
+
         stocks = StockMarket.query.all()
         for stock in stocks:
-            new_price = float(stock.price) * (1 + random.uniform(-0.01, 0.01))
+            if stock.trend == "bullish":
+                change = random.uniform(-0.005, 0.015)
+            elif stock.trend == "bearish":
+                change = random.uniform(-0.015, 0.005)
+            else:
+                change = random.uniform(-0.01, 0.01)
+
+            new_price = float(stock.price) * (1 + change)
             stock.price = max(new_price, 0)
-            print(f"Stock: {stock.ticker_symbol} updated to ${stock.price:.2f}")
+
+            print(f"{stock.ticker_symbol} ({stock.trend}): ${stock.price:.2f} ({change*100:+.2f}%)")
+
         db.session.commit()
 
 def is_market_open():
@@ -827,6 +845,7 @@ def logout():
 
 scheduler.start()
 scheduler.add_job(id="Update Stock Price", func=update_stock_price, trigger="interval", seconds=30)
+scheduler.add_job(id="Assign Daily Trends", func=assign_daily_trends, trigger="cron", hour=6, minute=0)
 
 if __name__ == '__main__':
     app.run(debug=True)
