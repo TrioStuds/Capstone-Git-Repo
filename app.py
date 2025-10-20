@@ -5,6 +5,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 import random
 from werkzeug.security import generate_password_hash, check_password_hash
+import holidays
 
 app = Flask(__name__)
 
@@ -121,7 +122,7 @@ class MarketHours(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     opening_time = db.Column(db.Time, nullable=False, default=datetime.strptime('9:00 AM', '%I:%M %p').time())
     closing_time = db.Column(db.Time, nullable=False, default=datetime.strptime('5:00 PM', '%I:%M %p').time())
-    is_active = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<MarketHours {self.opening_time}-{self.closing_time} {'Active' if self.is_active else 'Inactive'}>"
@@ -136,6 +137,11 @@ class MarketSchedule(db.Model):
     def __repr__(self):
         status = "Holiday" if self.is_holiday else "Open"
         return f"<MarketSchedule {self.market.name} {self.start_date} to {self.end_date} ({status})>"
+    
+class MarketHoliday(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
 
 with app.app_context():
     db.create_all()
@@ -185,6 +191,15 @@ def is_market_open():
     market_hours = MarketHours.query.first()
     current_time = datetime.now().time()
     today = datetime.now().strftime("%A")
+    holiday_check = datetime.now().date()
+
+    us_holidays = holidays.UnitedStates()
+    if holiday_check in us_holidays:
+        return False
+    
+    market_holiday = MarketHoliday.query.filter_by(date=holiday_check).first()
+    if market_holiday:
+        return False
 
     if not market_schedule or market_schedule.is_holiday:
         return False
@@ -213,8 +228,6 @@ def is_market_open():
         in_time_range = False
 
     return in_day_range and in_time_range
-
-from flask import request
 
 @app.before_request
 def check_admin_exists():
@@ -409,8 +422,32 @@ def admin_home():
     market_hours = MarketHours.query.first()
     market_schedule = MarketSchedule.query.first() #added for market schedule
 
-    # Handling stock creation
     if request.method == 'POST':
+        if 'add_holiday' in request.form:
+            holiday_date = request.form.get('holiday_date')
+            holiday_name = request.form.get('holiday_name')
+
+            if not holiday_date or not holiday_name:
+                flash("Please enter both a date and name for the holiday.", "warning")
+                return redirect(url_for('admin_home'))
+
+            existing = MarketHoliday.query.filter_by(date=holiday_date).first()
+            us_holidays = holidays.UnitedStates()
+            if existing or holiday_date in us_holidays:
+                flash("A holiday already exists on that date.", "warning")
+                return redirect(url_for('admin_home'))
+
+            try:
+                new_holiday = MarketHoliday(date=holiday_date, name=holiday_name)
+                db.session.add(new_holiday)
+                db.session.commit()
+                flash(f"Added holiday: {holiday_name} ({holiday_date})", "success")
+            except Exception as e:
+                db.session.rollback()
+                flash("Error adding holiday. Please check your input.", "danger")
+
+            return redirect(url_for('admin_home'))
+        
         company_name = request.form.get('company_name')
         ticker = request.form.get('ticker')
         price = request.form.get('price')
