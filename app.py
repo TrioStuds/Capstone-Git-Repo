@@ -291,32 +291,77 @@ def customer_home():
                 return redirect(url_for('customer_home'))
             
             else:
-                # Update portfolio
-                portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
-                stock.volume -= quantity
+                if is_market_open():
+                    # Update portfolio
+                    portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
+                    stock.volume -= quantity
 
-                if portfolio_entry:
-                    old_total_value = portfolio_entry.avg_purchase_price * portfolio_entry.quantity
-                    new_total_value = old_total_value + total_cost
-                    portfolio_entry.quantity += quantity
-                    portfolio_entry.avg_purchase_price = new_total_value / portfolio_entry.quantity
-                else:
-                    portfolio_entry = Portfolio(
+                    if portfolio_entry:
+                        old_total_value = portfolio_entry.avg_purchase_price * portfolio_entry.quantity
+                        new_total_value = old_total_value + total_cost
+                        portfolio_entry.quantity += quantity
+                        portfolio_entry.avg_purchase_price = new_total_value / portfolio_entry.quantity
+                    else:
+                        portfolio_entry = Portfolio(
+                            user_id=user.id,
+                            stock_id=stock.id,
+                            quantity=quantity,
+                            avg_purchase_price=stock.price
+                        )
+                        db.session.add(portfolio_entry)
+
+                    # Record order and transaction
+                    order = OrderHistory(
                         user_id=user.id,
                         stock_id=stock.id,
+                        order_type="BUY",
                         quantity=quantity,
-                        avg_purchase_price=stock.price
+                        price=stock.price,
+                        total_cost=total_cost,
+                        order_placed_at=datetime.utcnow(),
+                        executed=True
                     )
-                    db.session.add(portfolio_entry)
+                    db.session.add(order)
+
+                    transaction = FinancialTransaction(
+                        user_id=user.id,
+                        amount=total_cost,
+                        transaction_type="WITHDRAWAL",
+                        related_order=order
+                    )
+                    db.session.add(transaction)
+                    user.cash -= total_cost
+                    db.session.commit()
+
+                    flash(f"Successfully bought {quantity} of {stock.ticker_symbol}", "success")
+                    return redirect(url_for('customer_home'))
+                
+                else:
+                    flash("Market is closed.", "danger")
+                    return redirect(url_for('customer_home'))
+
+        elif action == "sell":
+            if is_market_open():
+                portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
+                if not portfolio_entry or portfolio_entry.quantity < quantity:
+                    flash("Not enough stock to sell", "danger")
+                    return redirect(url_for('customer_home'))
+
+                total_sale = stock.price * quantity
+                portfolio_entry.quantity -= quantity
+                stock.volume += quantity
+
+                if portfolio_entry.quantity <= 0:
+                    db.session.delete(portfolio_entry)
 
                 # Record order and transaction
                 order = OrderHistory(
                     user_id=user.id,
                     stock_id=stock.id,
-                    order_type="BUY",
+                    order_type="SELL",
                     quantity=quantity,
                     price=stock.price,
-                    total_cost=total_cost,
+                    total_cost=total_sale,
                     order_placed_at=datetime.utcnow(),
                     executed=True
                 )
@@ -324,55 +369,20 @@ def customer_home():
 
                 transaction = FinancialTransaction(
                     user_id=user.id,
-                    amount=total_cost,
-                    transaction_type="WITHDRAWAL",
+                    amount=total_sale,
+                    transaction_type="DEPOSIT",
                     related_order=order
                 )
                 db.session.add(transaction)
-                user.cash -= total_cost
+                user.cash += total_sale
                 db.session.commit()
 
-                flash(f"Successfully bought {quantity} of {stock.ticker_symbol}", "success")
+                flash(f"Successfully sold {quantity} of {stock.ticker_symbol}", "success")
                 return redirect(url_for('customer_home'))
-
-        elif action == "sell":
-            portfolio_entry = Portfolio.query.filter_by(user_id=user.id, stock_id=stock.id).first()
-            if not portfolio_entry or portfolio_entry.quantity < quantity:
-                flash("Not enough stock to sell", "danger")
+            
+            else:
+                flash("Market is closed.", "danger")
                 return redirect(url_for('customer_home'))
-
-            total_sale = stock.price * quantity
-            portfolio_entry.quantity -= quantity
-            stock.volume += quantity
-
-            if portfolio_entry.quantity <= 0:
-                db.session.delete(portfolio_entry)
-
-            # Record order and transaction
-            order = OrderHistory(
-                user_id=user.id,
-                stock_id=stock.id,
-                order_type="SELL",
-                quantity=quantity,
-                price=stock.price,
-                total_cost=total_sale,
-                order_placed_at=datetime.utcnow(),
-                executed=True
-            )
-            db.session.add(order)
-
-            transaction = FinancialTransaction(
-                user_id=user.id,
-                amount=total_sale,
-                transaction_type="DEPOSIT",
-                related_order=order
-            )
-            db.session.add(transaction)
-            user.cash += total_sale
-            db.session.commit()
-
-            flash(f"Successfully sold {quantity} of {stock.ticker_symbol}", "success")
-            return redirect(url_for('customer_home'))
 
     stocks = StockMarket.query.all()
 
