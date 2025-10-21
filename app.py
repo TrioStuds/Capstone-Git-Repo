@@ -155,7 +155,7 @@ with app.app_context():
         db.session.add(MarketSchedule(start_day="Monday", end_day="Friday", note="Monday - Friday"))
         db.session.commit()
 
-def assign_daily_trends():
+def assign_trends():
     with app.app_context():
         stocks = StockMarket.query.all()
         for stock in stocks:
@@ -882,7 +882,7 @@ def logout():
 
 scheduler.start()
 scheduler.add_job(id="Update Stock Price", func=update_stock_price, trigger="interval", seconds=30)
-scheduler.add_job(id="Assign Daily Trends", func=assign_daily_trends, trigger="interval", hours=1)
+scheduler.add_job(id="Assign Daily Trends", func=assign_trends, trigger="interval", hours=1)
 
 if __name__ == '__main__':
     app.run(debug=True)
