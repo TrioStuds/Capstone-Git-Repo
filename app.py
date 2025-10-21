@@ -160,7 +160,7 @@ def assign_trends():
         stocks = StockMarket.query.all()
         for stock in stocks:
             stock.trend = random.choice(["bullish", "bearish"])
-            print(f"{stock.ticker_symbol} is {stock.trend} today.")
+            print(f"{stock.ticker_symbol} is {stock.trend} now.")
         db.session.commit()
 
 # Random Price Generator
@@ -881,8 +881,8 @@ def logout():
     return redirect(url_for('login'))
 
 scheduler.start()
+scheduler.add_job(id="Assign Trends", func=assign_trends, trigger="interval", minutes=30)
 scheduler.add_job(id="Update Stock Price", func=update_stock_price, trigger="interval", seconds=30)
-scheduler.add_job(id="Assign Daily Trends", func=assign_trends, trigger="interval", hours=1)
 
 if __name__ == '__main__':
     app.run(debug=True)
