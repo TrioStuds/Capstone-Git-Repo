@@ -882,7 +882,7 @@ def logout():
 
 scheduler.start()
 scheduler.add_job(id="Update Stock Price", func=update_stock_price, trigger="interval", seconds=30)
-scheduler.add_job(id="Assign Daily Trends", func=assign_daily_trends, trigger="cron", hour=6, minute=0)
+scheduler.add_job(id="Assign Daily Trends", func=assign_daily_trends, trigger="interval", hours=1)
 
 if __name__ == '__main__':
     app.run(debug=True)
