@@ -498,7 +498,9 @@ def register():
         bank_account_number = request.form.get('bank_account_number')
 
         existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
+        existing_admin = Administrator.query.filter_by(email=email).first()
+
+        if existing_user or existing_admin:
             flash("Email already registered!", "danger")
             return redirect(url_for('register'))
         
