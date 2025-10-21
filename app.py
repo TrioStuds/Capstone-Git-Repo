@@ -122,7 +122,7 @@ class MarketHours(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     opening_time = db.Column(db.Time, nullable=False, default=datetime.strptime('9:00 AM', '%I:%M %p').time())
     closing_time = db.Column(db.Time, nullable=False, default=datetime.strptime('5:00 PM', '%I:%M %p').time())
-    is_active = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f"<MarketHours {self.opening_time}-{self.closing_time} {'Active' if self.is_active else 'Inactive'}>"
