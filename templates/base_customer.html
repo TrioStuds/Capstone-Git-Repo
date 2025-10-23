@@ -10,7 +10,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-1 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #141414);">
+      <div class="col-lg-1 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #141414);">
           <nav class="nav flex-column">
               <a class="nav-link text-light text-center {% if request.endpoint == 'customer_home' %}active{% endif %}" 
                 href="{{ url_for('customer_home') }}"
@@ -56,7 +56,7 @@
               </a>
           </nav>
       </div>
-      <div class="col-11 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
+      <div class="col-lg-11 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
           <div class="text-center mt-4">
               <h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 300; letter-spacing: -0.5px; color: white;">{% block page_header %}{% endblock %}</h1>
               {% block content %}{% endblock %}

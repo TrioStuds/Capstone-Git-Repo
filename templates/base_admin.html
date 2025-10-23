@@ -9,7 +9,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-1 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #141414);">
+      <div class="col-lg-1 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #141414);">
           <nav class="nav flex-column">
           <a class="nav-link text-light text-center {% if request.endpoint == 'admin_home' %}active{% endif %}"
             href="{{ url_for('admin_home') }}"
@@ -27,13 +27,14 @@
           </a>
           <a class="nav-link text-light text-center" 
             href="{{url_for('logout')}}"
+            style="background-color: #4B0B5C !important; transition: background-color 0.3s; margin: 2px 0; border-radius: 5px;"
             onmouseover="this.style.setProperty('background-color', '#E0348E', 'important')" 
             onmouseout="this.style.setProperty('background-color', '#4B0B5C', 'important')">
             Log Out
           </a>
         </nav>
       </div>
-      <div class="col-11 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
+      <div class="col-lg-11 min-vh-100 d-flex flex-column" style="background: linear-gradient(180deg, #4B0B5C, #E0348E);">
           {% block content %}{% endblock %}
           <footer class="text-light mt-auto">
             <div class="py-3"><p class="text-center mb-0">© 2025 VPN Trading</p></div>
