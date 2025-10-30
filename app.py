@@ -9,7 +9,7 @@ import holidays
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/vpn_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Triostuds69!@vpn-db.cboyqwso4bjq.us-east-2.rds.amazonaws.com/vpn_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'vpn_secret_key'
 
