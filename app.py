@@ -54,6 +54,9 @@ class StockMarket(db.Model):
     company_name = db.Column(db.String(150), nullable=False)
     volume = db.Column(db.Numeric(5), nullable=False)
     trend = db.Column(db.String(10), nullable=True)
+    shares_outstanding = db.Column(db.BigInteger, nullable=False, default=volume)
+    daily_high = db.Column(db.Numeric(10, 2), nullable=False, default=price)
+    daily_low = db.Column(db.Numeric(10, 2), nullable=False, default=price)
 
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
