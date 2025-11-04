@@ -924,7 +924,7 @@ def logout():
 scheduler.start()
 scheduler.add_job(id="Assign Trends", func=assign_trends, trigger="interval", minutes=30)
 scheduler.add_job(id="Update Stock Price", func=update_stock_price, trigger="interval", seconds=30)
-scheduler.add_job(id="Reset daily high and low values", func=reset_daily_high_and_low, trigger="cron", day_of_week="mon-sun", hour=9, minute=0)
+scheduler.add_job(id="Reset daily high and low values", func=reset_daily_high_and_low, trigger="cron", day_of_week="mon-sun", hour=0, minute=0)
 
 if __name__ == '__main__':
     app.run(debug=True)
