@@ -132,6 +132,9 @@
                                         <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Company</th>
                                         <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Price</th>
                                         <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Volume</th>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Market Cap</th>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Daily High</th>
+                                        <th style="background: linear-gradient(180deg, #4B0B5C, #E0348E); color: white;">Daily Low</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -141,6 +144,9 @@
                                         <td>{{ stock.company_name }}</td>
                                         <td>${{ "{:,.2f}".format(stock.price) }}</td>
                                         <td>{{ stock.volume }}</td>
+                                        <td>${{ "{:,.0f}".format(stock.price * stock.shares_outstanding) }}</td>
+                                        <td>${{ "{:,.2f}".format(stock.daily_high) }}</td>
+                                        <td>${{ "{:,.2f}".format(stock.daily_low) }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

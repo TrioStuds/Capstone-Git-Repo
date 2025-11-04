@@ -54,6 +54,9 @@ class StockMarket(db.Model):
     company_name = db.Column(db.String(150), nullable=False)
     volume = db.Column(db.Numeric(5), nullable=False)
     trend = db.Column(db.String(10), nullable=True)
+    shares_outstanding = db.Column(db.BigInteger, nullable=False, default=volume)
+    daily_high = db.Column(db.Numeric(10, 2), nullable=False, default=price)
+    daily_low = db.Column(db.Numeric(10, 2), nullable=False, default=price)
 
     portfolio_entries = db.relationship('Portfolio', back_populates='stock', lazy=True)
 
@@ -182,6 +185,11 @@ def update_stock_price():
             new_price = float(stock.price) * (1 + change)
             stock.price = max(new_price, 0)
 
+            if new_price >= stock.daily_high:
+                stock.daily_high = new_price
+            if new_price <= stock.daily_low:
+                stock.daily_low = new_price
+            
             print(f"{stock.ticker_symbol} ({stock.trend}): ${stock.price:.2f} ({change*100:+.2f}%)")
 
         db.session.commit()
@@ -228,6 +236,19 @@ def is_market_open():
         in_time_range = False
 
     return in_day_range and in_time_range
+
+def update_high_and_low():
+    with app.app_context():
+        stocks = StockMarket.query.all()
+
+        for stock in stocks:
+            price = stock.price
+            if price > stock.daily_high:
+                stock.daily_high = price
+            if price < stock.daily_low:
+                stock.daily_low = price
+
+        db.session.commit()
 
 @app.before_request
 def check_admin_exists():
