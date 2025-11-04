@@ -83,7 +83,7 @@ class OrderHistory(db.Model):
     quantity = db.Column(db.Numeric(10, 2), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     total_cost = db.Column(db.Numeric(12, 2), nullable=False)
-    order_placed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    order_placed_at = db.Column(db.DateTime, default=datetime.now())
     executed = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', back_populates='orders')
@@ -102,7 +102,7 @@ class FinancialTransaction(db.Model):
         nullable=False
     )
     related_order_id = db.Column(db.Integer, db.ForeignKey('order_history.id'), nullable=True)  
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now())
 
     user = db.relationship('User', back_populates='transactions')
     related_order = db.relationship('OrderHistory')
@@ -318,7 +318,7 @@ def customer_home():
                         quantity=quantity,
                         price=stock.price,
                         total_cost=total_cost,
-                        order_placed_at=datetime.utcnow(),
+                        order_placed_at=datetime.now(),
                         executed=True
                     )
                     db.session.add(order)
@@ -362,7 +362,7 @@ def customer_home():
                     quantity=quantity,
                     price=stock.price,
                     total_cost=total_sale,
-                    order_placed_at=datetime.utcnow(),
+                    order_placed_at=datetime.now(),
                     executed=True
                 )
                 db.session.add(order)
