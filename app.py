@@ -49,7 +49,7 @@ class BankInfo(db.Model):
     
 class StockMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True) 
-    ticker_symbol = db.Column(db.String(4), unique=True, nullable=False)
+    ticker_symbol = db.Column(db.String(5), unique=True, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     company_name = db.Column(db.String(150), nullable=False)
     volume = db.Column(db.Numeric(5), nullable=False)
